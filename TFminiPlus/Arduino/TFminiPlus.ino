@@ -10,30 +10,38 @@ int dist;		// 距離
 int strength;	// 強度
 int temp;		// 晶片溫度
 int check;		// checksum
-int i;
 int data[9];	// TFmini Plus data
 
-int count;
+// int count;
 
-SoftwareSerial TFPlus(10,11);	// RX|TX
+SoftwareSerial TFPlus(10,11);	// RX|TX	TFmini Plus
+// SoftwareSerial BTSerial(2,3);	// RX|TX	Bluetooth
+
+int freeRam () 	// The function is check SRAM 
+{
+  extern int __heap_start, *__brkval; 
+  int v; 
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
+}
 
 void setup(void)
 {
 	Serial.begin(9600);			// Serial bard rate
 	TFPlus.begin(115200);		// TFmini Plus bard rate
-	Serial.println("Program is start");
+	// BTSerial.begin(38400);		// Bluetooth bard rate
+	Serial.println(F("Program is start"));
 }
 
 void loop(void)
 {
-	Serial.print(count++);
-	Serial.print(". ");
+	// Serial.print(count++);
+	// Serial.print(". ");
 	if (TFPlus.available()) {
 		if (TFPlus.read() == HEADER) {		// read data equal 0x59
 			data[0] = HEADER;
 			if (TFPlus.read() == HEADER) {	// read data equal 0x59
 				data[1] = HEADER;
-				for (i=2; i<9; i++) {
+				for (int i=2; i<9; i++) {
 					data[i] = TFPlus.read();
 				}
 
@@ -45,20 +53,20 @@ void loop(void)
 					strength = data[4] + (data[5] << 4);
 					temp = data[6] + (data[7] << 4);
 					// output data
-					Serial.println("=================");
-					Serial.print("dist = ");
+					Serial.println(F("================="));
+					Serial.print(F("dist = "));
 					Serial.println(dist);
-					Serial.print("strength = ");
+					Serial.print(F("strength = "));
 					Serial.println(strength);
-					Serial.print("temp = ");
+					Serial.print(F("temp = "));
 					Serial.println(temp);
 				} else {
-					Serial.println("Check data is Error.");
+					Serial.println(F("Check data is Error."));
 				}
 			}
 		}
 	} else {
-		Serial.println("TFPlus is not available data");
+		Serial.println(F("TFPlus is not available data"));
 	}
 	delay(100);
 }
