@@ -17,7 +17,7 @@ int data[9];	// TFmini Plus data
 SoftwareSerial TFPlus(10,11);	// RX|TX	TFmini Plus
 // SoftwareSerial BTSerial(2,3);	// RX|TX	Bluetooth
 
-int freeRam () 	// The function is check SRAM 
+int freeRam() 	// The function is check SRAM available space
 {
   extern int __heap_start, *__brkval; 
   int v; 
@@ -68,5 +68,8 @@ void loop(void)
 	} else {
 		Serial.println(F("TFPlus is not available data"));
 	}
+	Serial.println();
+	Serial.print(F("SRAM="));
+	Serial.println(freeRam());
 	delay(100);
 }
