@@ -14,35 +14,26 @@ int data[9];	// TFmini Plus data
 
 // int count;
 
-SoftwareSerial TFPlus(10,11);	// RX|TX	TFmini Plus
-// SoftwareSerial BTSerial(2,3);	// RX|TX	Bluetooth
+SoftwareSerial BTSerial(10,11);	// RX|TX	TFmini Plus
 
-int freeRam() 	// The function is check SRAM available space
-{
-  extern int __heap_start, *__brkval; 
-  int v; 
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
-}
 
 void setup(void)
 {
-	Serial.begin(9600);			// Serial bard rate
-	TFPlus.begin(115200);		// TFmini Plus bard rate
-	// BTSerial.begin(38400);		// Bluetooth bard rate
-	Serial.println(F("Program is start"));
+	Serial.begin(115200);		// TFmini Plus bard rate
+	BTSerial.begin(9600);		// Bluetooth bard rate
 }
 
 void loop(void)
 {
 	// Serial.print(count++);
 	// Serial.print(". ");
-	if (TFPlus.available()) {
-		if (TFPlus.read() == HEADER) {		// read data equal 0x59
+	if (Serial.available()) {
+		if (Serial.read() == HEADER) {		// read data equal 0x59
 			data[0] = HEADER;
-			if (TFPlus.read() == HEADER) {	// read data equal 0x59
+			if (Serial.read() == HEADER) {	// read data equal 0x59
 				data[1] = HEADER;
 				for (int i=2; i<9; i++) {
-					data[i] = TFPlus.read();
+					data[i] = Serial.read();
 				}
 
 				// add data[0] to data[7]
@@ -53,23 +44,15 @@ void loop(void)
 					strength = data[4] + (data[5] << 4);
 					temp = data[6] + (data[7] << 4);
 					// output data
-					Serial.println(F("================="));
-					Serial.print(F("dist = "));
-					Serial.println(dist);
-					Serial.print(F("strength = "));
-					Serial.println(strength);
-					Serial.print(F("temp = "));
-					Serial.println(temp);
+					String dataString = "dist:" + dist + ",strength:" + strength + ",temp:" + temp;
+					BTSerial.println(dataString);
 				} else {
-					Serial.println(F("Check data is Error."));
+					// Serial.println(F("Check data is Error."));
 				}
 			}
 		}
 	} else {
-		Serial.println(F("TFPlus is not available data"));
+		// Serial.println(F("TFPlus is not available data"));
 	}
-	Serial.println();
-	Serial.print(F("SRAM="));
-	Serial.println(freeRam());
 	delay(100);
 }
