@@ -1,21 +1,90 @@
 /**
-  * Bluetooth test program
+  *	This program code is Arduino UNO send data to Bluetooth
   */
 
 #include <SoftwareSerial.h>
 
-SoftwareSerial BTSerial(10,11);		// RX|TX
+#define HEADER 0x59
 
-void setup()
+SoftwareSerial TF(10,11);		// RX|TX
+
+struct TF {
+	int dist;
+	int strength;
+	int temp;
+}TFmini;
+
+void TFSerialFlush()
 {
-	Serial.begin(9600);
-	BTSerial.begin(9600);	// Bluetooth bard rate
+	while(TF.available() > 0) {
+		char ch = TF.read();
+	}
 }
 
-void loop()
+// Send character array to Bluetooth
+void Send(char* str)
 {
-	if (Serial.available()) {
-		// BTSerial.println(Serial.readString());
-    Serial.println(BTSerial.readString());
+	int i=0;
+	while(str[i] != '\0') {
+		Serial.write(str[i]);
+	}
+}
+
+
+// Send string to Bluetooth
+void BTSend(String str)
+{
+	char charbuff[str.length() + 1];
+	str.toCharArray(charbuff, (str.length() + 1));
+	Send(charbuff);
+}
+
+void setup(void)
+{
+	Serial.begin(115200);		// Bluetooth
+	TF.begin(115200);
+}
+
+void loop(void)
+{
+	String str = "";
+	int data[9];
+	int check;
+	if (TF.available() > 0) {
+		if (TF.read() == HEADER) {
+			data[0] = HEADER;
+			if (TF.read() == HEADER) {
+				data[1] = HEADER;
+				for (int i=2; i<9; i++) {
+					data[i] = TF.read();
+				}
+				check = data[0] + data[1] + data[2] + data[3] + data[4] + data[5] + data[6] + data[7];
+				if (data[8] == (check & 0xFF)) {
+					TFmini.dist = data[2] + (data[3] << 8);
+					TFmini.strength = data[4] + (data[5] << 8);
+					TFmini.temp = data[6] + (data[7] << 8);
+
+					str = "dist=";
+					str += TFmini.dist;
+					str += ",strength=";
+					str += TFmini.strength;
+					str += ",temp=";
+					str += TFmini.temp;
+
+					// BTSend(str);
+
+					Serial.println(str);
+				} else {
+					// Serial.println("Check Error");
+					TFSerialFlush();
+				}
+			} else {
+				// Serial.println("Not find two HEADER");
+				TFSerialFlush();
+			}
+		} else {
+			// Serial.println("Not find one HEADER");
+			TFSerialFlush();
+		}
 	}
 }
