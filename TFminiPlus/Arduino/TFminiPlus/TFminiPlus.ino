@@ -9,7 +9,7 @@
 struct TFdata {
 	int dist;
 	int strength;
-	int temp;
+	float temp;
 }TF;
 
 
@@ -45,7 +45,7 @@ void ReadTFmini(SoftwareSerial *pTF, TFdata *pTFdata)
 				if (data[8] == (check & 0xFF)) {
 					pTFdata->dist = data[2] + (data[3] << 8);
 					pTFdata->strength = data[4] + (data[5] << 8);
-					pTFdata->temp = data[6] + (data[7] << 8);
+					pTFdata->temp = ((data[6] + (data[7] << 8)) / 100);
 					flag = true;
 				} else {
 					Serial.println("Check Error.");
@@ -62,6 +62,20 @@ void ReadTFmini(SoftwareSerial *pTF, TFdata *pTFdata)
 	}
 }
 
+String resultString(TFdata *pTFdata)
+{
+	String str = "";
+
+	str = "dist=";
+	str += pTFdata->dist;
+	str += ",strength=";
+	str += pTFdata->strength;
+	str += ",temp=";
+	str += pTFdata->temp;
+
+	return str;
+}
+
 void setup(void)
 {
 	Serial.begin(115200);
@@ -71,13 +85,6 @@ void setup(void)
 void loop(void)
 {
 	ReadTFmini(&TFmini, &TF);
-	String str;
-	str = "dist=";
-	str += TF.dist;
-	str += ",strength=";
-	str += TF.strength;
-	str += ",temp=";
-	str += TF.temp;
 	if (flag)
-		Serial.println(str);
+		Serial.println(resultString(&TF));
 }
