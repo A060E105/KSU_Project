@@ -3,28 +3,32 @@
   * Now have one TFmini Plus
   */
 
+#include <ArduinoJson.h>
 #include <HardwareSerial.h>
 #include <BluetoothSerial.h>
 
 #define HEADER 0x59
 
+StaticJsonDocument<200> jsondata;
+
 BluetoothSerial BT;			// Bluetooth 
 
-// HardwareSerial L_TFmini(1);			// Left TFmini Plus
+HardwareSerial L_TFmini(1);			// Left TFmini Plus
 HardwareSerial R_TFmini(2);			// Right TFmini Plus
 
 struct TFdata{
+	const String name;
 	int dist;
 	int strength;
 	float temp;
-}R_TF;
+}R_TFdata={"R"},L_TFdata={"L"};
 
 // Clean Serial buffer
-void CleanFlush(HardwareSerial *TF)
+void CleanFlush(HardwareSerial *pTF)
 {
 	char ch;
-	while(TF->available() > 0) {
-		ch = TF->read();
+	while(pTF->available() > 0) {
+		ch = pTF->read();
 	}
 }
 
@@ -67,7 +71,9 @@ String resultString(TFdata *pTFdata)
 {
 	String str = "";
 
-	str = "dist=";
+	str = "sensor=";
+	str += pTFdata->name;
+	str += ",dist=";
 	str += pTFdata->dist;
 	str += ",strength=";
 	str += pTFdata->strength;
@@ -77,19 +83,34 @@ String resultString(TFdata *pTFdata)
 	return str;
 }
 
+void sendJSON(TFdata *pL_TFdata, TFdata *pR_TFdata)
+{
+	// left sensor data
+	jsondata[pL_TFdata->name]["dist"] = pL_TFdata->dist;
+	jsondata[pL_TFdata->name]["strength"] = pL_TFdata->strength;
+	jsondata[pL_TFdata->name]["temp"] = pL_TFdata->temp;
+	// right sensor data
+	jsondata[pR_TFdata->name]["dist"] = pR_TFdata->dist;
+	jsondata[pR_TFdata->name]["strength"] = pR_TFdata->strength;
+	jsondata[pR_TFdata->name]["temp"] = pR_TFdata->temp;
+
+	serializeJson(jsondata, BT);		// send json data to Bluetooth
+	serializeJson(jsondata, Serial);	// send json data to Serial
+}
+
 void setup(void)
 {
 	Serial.begin(115200);
-	BT.begin("TFminiPlus");
-	// L_TFmini.begin(115200, SERIAL_8N1, 4, 2);		// baud rate, parity, RX|TX
-	R_TFmini.begin(115200, SERIAL_8N1, 16, 17);
+	BT.begin("TFminiPlus");							// set Bluetooth name
+	L_TFmini.begin(115200, SERIAL_8N1, 4, 2);		// baud rate, parity, RX|TX ; Left TFmini Plus sensor.
+	R_TFmini.begin(115200, SERIAL_8N1, 16, 17);		// right TFmini plus sensor.
 	Serial.println("Start program.");
 }
 
 
 void loop(void)
 {
-	ReadTFmini(&R_TFmini, &R_TF);
-	Serial.println(resultString(&R_TF));
-	BT.println(resultString(&R_TF));
+	ReadTFmini(&R_TFmini, &R_TFdata);		// Read Right TFmini plus data
+	ReadTFmini(&L_TFmini, &L_TFdata);		// Read Left TFmini plus data
+	sendJSON(&L_TFdata, &R_TFdata);			// data to json and send
 }
