@@ -1,6 +1,5 @@
 /**
   * Useing UART1/UART2
-  * Now have one TFmini Plus
   */
 
 #include <ArduinoJson.h>
@@ -8,6 +7,8 @@
 #include <BluetoothSerial.h>
 
 #define HEADER 0x59
+#define L_LED 12
+#define R_LED 15
 
 StaticJsonDocument<200> jsondata;
 
@@ -16,6 +17,9 @@ BluetoothSerial BT;			// Bluetooth
 HardwareSerial L_TFmini(1);			// Left TFmini Plus
 HardwareSerial R_TFmini(2);			// Right TFmini Plus
 
+const int distance = 600;			// Set distance value
+
+// TFmini plus data struct
 struct TFdata{
 	const String name;
 	int dist;
@@ -83,6 +87,7 @@ String resultString(TFdata *pTFdata)
 	return str;
 }
 
+// data to JSON and send JSON data
 void sendJSON(TFdata *pL_TFdata, TFdata *pR_TFdata)
 {
 	// left sensor data
@@ -98,9 +103,35 @@ void sendJSON(TFdata *pL_TFdata, TFdata *pR_TFdata)
 	serializeJson(jsondata, Serial);	// send json data to Serial
 }
 
+// Control LED Status
+void led_Status(int pin, int status)
+{
+	digitalWrite(pin, status);
+}
+
+// Too close warning
+void warning(TFdata *pL_TFdata, TFdata *pR_TFdata)
+{
+	// Left
+	if (pL_TFdata->dist < distance) {
+		led_Status(L_LED, HIGH);
+	} else {
+		led_Status(L_LED, LOW);
+	}
+
+	// Right
+	if (pR_TFdata->dist < distance) {
+		led_Status(R_RED, HIGH);
+	} else {
+		led_Status(R_RED, LOW);
+	}
+}
+
 void setup(void)
 {
-	Serial.begin(115200);
+	pinMode(L_LED, OUTPUT);							// Left LED Set Output mode
+	pinMode(R_LED, OUTPUT);							// Right LED Set Output mode
+	Serial.begin(115200);							// Set Serial baudrate
 	BT.begin("TFminiPlus");							// set Bluetooth name
 	L_TFmini.begin(115200, SERIAL_8N1, 4, 2);		// baud rate, parity, RX|TX ; Left TFmini Plus sensor.
 	R_TFmini.begin(115200, SERIAL_8N1, 16, 17);		// right TFmini plus sensor.
