@@ -7,8 +7,8 @@
 #include <BluetoothSerial.h>
 
 #define HEADER 0x59
-#define L_LED 12
-#define R_LED 15
+#define L_LED 18
+#define R_LED 19
 
 StaticJsonDocument<200> jsondata;
 
@@ -17,7 +17,7 @@ BluetoothSerial BT;			// Bluetooth
 HardwareSerial L_TFmini(1);			// Left TFmini Plus
 HardwareSerial R_TFmini(2);			// Right TFmini Plus
 
-const int distance = 600;			// Set distance value
+const int distance = 100;			// Set distance value
 
 // TFmini plus data struct
 struct TFdata{
@@ -71,6 +71,7 @@ void ReadTFmini(HardwareSerial *pTFmini, TFdata *pTFdata)
 	}
 }
 
+// Debug function
 String resultString(TFdata *pTFdata)
 {
 	String str = "";
@@ -109,28 +110,32 @@ void led_Status(int pin, int status)
 	digitalWrite(pin, status);
 }
 
-// Too close warning
+// Distance Too close warning
 void warning(TFdata *pL_TFdata, TFdata *pR_TFdata)
 {
 	// Left
-	if (pL_TFdata->dist < distance) {
+	if (pL_TFdata->dist <= distance) {
 		led_Status(L_LED, HIGH);
 	} else {
 		led_Status(L_LED, LOW);
 	}
 
 	// Right
-	if (pR_TFdata->dist < distance) {
-		led_Status(R_RED, HIGH);
+	if (pR_TFdata->dist <= distance) {
+		led_Status(R_LED, HIGH);
 	} else {
-		led_Status(R_RED, LOW);
+		led_Status(R_LED, LOW);
 	}
 }
 
 void setup(void)
 {
+	// Initialization LED
 	pinMode(L_LED, OUTPUT);							// Left LED Set Output mode
 	pinMode(R_LED, OUTPUT);							// Right LED Set Output mode
+	led_Status(L_LED, LOW);							// Set LED status is LOW
+	led_Status(R_LED, LOW);
+
 	Serial.begin(115200);							// Set Serial baudrate
 	BT.begin("TFminiPlus");							// set Bluetooth name
 	L_TFmini.begin(115200, SERIAL_8N1, 4, 2);		// baud rate, parity, RX|TX ; Left TFmini Plus sensor.
@@ -144,4 +149,5 @@ void loop(void)
 	ReadTFmini(&R_TFmini, &R_TFdata);		// Read Right TFmini plus data
 	ReadTFmini(&L_TFmini, &L_TFdata);		// Read Left TFmini plus data
 	sendJSON(&L_TFdata, &R_TFdata);			// data to json and send
+	warning(&L_TFdata, &R_TFdata);			// Distance Too close warning
 }
