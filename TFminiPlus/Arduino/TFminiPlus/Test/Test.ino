@@ -32,7 +32,7 @@ String get_BT_name(void)
 {
 	unsigned int i = 0;
 	unsigned int j = 0;
-	String name;
+	char name[20];
 	String data = get_EEPROM_data();
 	while(data[i] != ',')
 		i++;
@@ -42,28 +42,33 @@ String get_BT_name(void)
 		i++;
 		j++;
 	}
+	name[j] = '\0';
 
-	return name;
+	return String(name);
 }
 
 int get_dist_value(void)
 {
 	unsigned int i = 0;
-	String value;
+	char value[5];
 	String data = get_EEPROM_data();
 	while(data[i] != ',') {
-		value = data[i];
+		value[i] = data[i];
+		i++;
 	}
+	value[i] = '\0';
 
-	return value.toInt();
+
+	return atoi(value);
 }
 
 void setup(void)
 {
 	Serial.begin(115200);
+	// EEPROM.begin(20);
 	Serial.println("Program Start.");
-	Serial.print("EEPROM data : ");
-	Serial.println(get_EEPROM_data());
+	// Serial.print("EEPROM data : ");
+	// Serial.println(get_EEPROM_data());
 }
 
 void loop(void)
@@ -85,10 +90,16 @@ void loop(void)
 				Serial.println("Set distance value");
 				break;
 			case '2':
+				str = Serial.readString();
 				Serial.println(get_dist_value());
 				break;
 			case '3':
+				str = Serial.readString();
 				Serial.println(get_BT_name());
+				break;
+			case '4':
+				str = Serial.readString();
+				Serial.println(get_EEPROM_data());
 				break;
 			default:
 				Serial.println("Error cmd");
