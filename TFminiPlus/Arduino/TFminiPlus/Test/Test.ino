@@ -4,7 +4,7 @@
 
 #include <EEPROM.h>
 
-void writeString(int startaddr, String str)
+void set_EEPROM_data(int startaddr, String str)
 {
 	int _size = str.length();
 	int i;
@@ -15,11 +15,11 @@ void writeString(int startaddr, String str)
 	EEPROM.end();
 }
 
-String readString(void)
+String get_EEPROM_data(void)
 {
 	int i = 0;
 	char str[20];
-	while(EEPROM.read(i) != '\0') {
+	while((EEPROM.read(i) != '\0') && i < 20) {
 		str[i] = EEPROM.read(i);
 		i++;
 	}
@@ -28,21 +28,71 @@ String readString(void)
 	return String(str);
 }
 
+String get_BT_name(void)
+{
+	unsigned int i = 0;
+	unsigned int j = 0;
+	String name;
+	String data = get_EEPROM_data();
+	while(data[i] != ',')
+		i++;
+	i++;
+	while(data[i] != '\0') {
+		name[j] = data[i];
+		i++;
+		j++;
+	}
+
+	return name;
+}
+
+int get_dist_value(void)
+{
+	unsigned int i = 0;
+	String value;
+	String data = get_EEPROM_data();
+	while(data[i] != ',') {
+		value = data[i];
+	}
+
+	return value.toInt();
+}
+
 void setup(void)
 {
 	Serial.begin(115200);
 	Serial.println("Program Start.");
-	EEPROM.begin(20);
-	Serial.println(readString());
+	Serial.print("EEPROM data : ");
+	Serial.println(get_EEPROM_data());
 }
 
 void loop(void)
 {
+	int cmd;
 	String str;
 	if (Serial.available() > 0) {
-		str = Serial.readString();
-		Serial.print(str);
-		writeString(0,str);
+		cmd = Serial.read();
+		switch(cmd) {
+			case '0':
+				str = Serial.readString();
+				Serial.println("Set Bluetooth name");
+				Serial.print("new name : ");
+				Serial.print(str);
+				set_EEPROM_data(0,str);
+				break;
+			case '1':
+				str = Serial.readString();
+				Serial.println("Set distance value");
+				break;
+			case '2':
+				Serial.println(get_dist_value());
+				break;
+			case '3':
+				Serial.println(get_BT_name());
+				break;
+			default:
+				Serial.println("Error cmd");
+				str = Serial.readString();
+		}
 	}
-
 }
