@@ -62,6 +62,20 @@ int get_dist_value(void)
 	return atoi(value);
 }
 
+void set_dist_value(int value)
+{
+	String name = get_BT_name();
+	String str = value + "," + name;
+	set_EEPROM_data(0,str);
+}
+
+void set_BT_name(String name)
+{
+	int value = get_dist_value();
+	String str = value + "," + name;
+	set_EEPROM_data(0,str);
+}
+
 void setup(void)
 {
 	Serial.begin(115200);
@@ -88,17 +102,26 @@ void loop(void)
 			case '1':
 				str = Serial.readString();
 				Serial.println("Set distance value");
+				set_dist_value(str.toInt());
 				break;
 			case '2':
 				str = Serial.readString();
-				Serial.println(get_dist_value());
+				Serial.println("Set BlueTooth name");
+				set_BT_name(str);
 				break;
 			case '3':
 				str = Serial.readString();
-				Serial.println(get_BT_name());
+				Serial.println("Get distance value");
+				Serial.println(get_dist_value());
 				break;
 			case '4':
 				str = Serial.readString();
+				Serial.println("Get BlueTooth name");
+				Serial.println(get_BT_name());
+				break;
+			case '5':
+				str = Serial.readString();
+				Serial.println("Get EEPROM data");
 				Serial.println(get_EEPROM_data());
 				break;
 			default:
