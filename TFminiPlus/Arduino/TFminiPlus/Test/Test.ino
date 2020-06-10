@@ -4,6 +4,8 @@
 
 #include <EEPROM.h>
 
+enum CMD {SET_EEPROM_DATA, GET_DISTANCE_VALUE, GET_BT_NAME, SET_DIST_VALUE, SET_BT_NAME, GET_EEPROM_DATA};
+
 void set_EEPROM_data(int startaddr, String str)
 {
 	int _size = str.length();
@@ -62,27 +64,26 @@ int get_dist_value(void)
 	return atoi(value);
 }
 
-void set_dist_value(int value)
+void set_dist_value(String value)
 {
 	String name = get_BT_name();
 	String str = value + "," + name;
+	Serial.println(str);
 	set_EEPROM_data(0,str);
 }
 
 void set_BT_name(String name)
 {
 	int value = get_dist_value();
-	String str = value + "," + name;
+	String str = String(value) + "," + name;
+	Serial.println(str);
 	set_EEPROM_data(0,str);
 }
 
 void setup(void)
 {
 	Serial.begin(115200);
-	// EEPROM.begin(20);
 	Serial.println("Program Start.");
-	// Serial.print("EEPROM data : ");
-	// Serial.println(get_EEPROM_data());
 }
 
 void loop(void)
@@ -90,43 +91,43 @@ void loop(void)
 	int cmd;
 	String str;
 	if (Serial.available() > 0) {
-		cmd = Serial.read();
+		cmd = Serial.read() - '0';
 		switch(cmd) {
-			case '0':
+			case SET_EEPROM_DATA:
 				str = Serial.readString();
 				Serial.println("Set Bluetooth name");
 				Serial.print("new name : ");
 				Serial.print(str);
 				set_EEPROM_data(0,str);
 				break;
-			case '1':
+			case SET_DIST_VALUE:
 				str = Serial.readString();
 				Serial.println("Set distance value");
-				set_dist_value(str.toInt());
+				set_dist_value(str);
 				break;
-			case '2':
+			case SET_BT_NAME:
 				str = Serial.readString();
 				Serial.println("Set BlueTooth name");
 				set_BT_name(str);
 				break;
-			case '3':
+			case GET_DISTANCE_VALUE:
 				str = Serial.readString();
 				Serial.println("Get distance value");
 				Serial.println(get_dist_value());
 				break;
-			case '4':
+			case GET_BT_NAME:
 				str = Serial.readString();
 				Serial.println("Get BlueTooth name");
 				Serial.println(get_BT_name());
 				break;
-			case '5':
+			case GET_EEPROM_DATA:
 				str = Serial.readString();
 				Serial.println("Get EEPROM data");
 				Serial.println(get_EEPROM_data());
 				break;
 			default:
-				Serial.println("Error cmd");
 				str = Serial.readString();
+				Serial.println("Error cmd");
 		}
 	}
 }
