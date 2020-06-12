@@ -1,6 +1,7 @@
 package com.example.tfminiplusapp;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -22,7 +23,7 @@ import static com.example.tfminiplusapp.R.id.navigation_view;
 
 public class MainActivity extends AppCompatActivity {
 
-    @BindView(R.id.navigation_view)
+    // @BindView(R.id.navigation_view)
     NavigationView navigation_view;
 
     @BindView(R.id.DrawerLayout)
@@ -36,8 +37,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AppCompatActivity activity = null;
-        activity.setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);
+
+        // 將drawerLayout和toolbar整合，會出現「三」按鈕
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        navigation_view = (NavigationView) findViewById(R.id.navigation_view);
 
         navigation_view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override

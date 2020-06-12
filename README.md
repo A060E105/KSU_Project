@@ -10,3 +10,6 @@ https://acroname.com/sites/default/files/assets/sj-gu-tfmini_plus-01-a04-datashe
 # ESP32 GPIO
 
 https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
+
+# Android DrawerLayout + Navigation
+https://blog.30sparks.com/material-design-1-navigation-drawer/
