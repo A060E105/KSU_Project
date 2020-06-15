@@ -5,7 +5,10 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
@@ -45,38 +48,42 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigation_view = (NavigationView) findViewById(R.id.navigation_view);
+        navigation_view.setNavigationItemSelectedListener();
 
-        navigation_view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                // 點選時收起選單
-                drawerLayout.closeDrawer(GravityCompat.START);
+        navigation_view.setNavigationItemSelectedListener(menuItem -> {
+            // 點選時收起選單
+            drawerLayout.closeDrawer(GravityCompat.START);
 
-                // 取得選項ID
-                int id = menuItem.getItemId();
+            // 取得選項ID
+            int id = menuItem.getItemId();
 
-                // 依照id判斷點了哪個項目並做相應事件
-                if (id == R.id.nav_home) {
-                    // 按下「首頁」要做的事
-                    Toast.makeText(MainActivity.this, "首頁", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-                else if (id == R.id.nav_message) {
-                    Toast.makeText(MainActivity.this, "詳細說明", Toast.LENGTH_SHORT).show();
-                }
-                else if (id == R.id.nav_help) {
-                    Toast.makeText(MainActivity.this, "幫助", Toast.LENGTH_LONG).show();
-                }
-                else if (id == R.id.nav_setting) {
-                    // 按下「使用說明」要做的事
-                    Toast.makeText(MainActivity.this, "設定", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-
-                return false;
+            // 依照id判斷點了哪個項目並做相應事件
+            if (id == R.id.nav_home) {
+                // 按下「首頁」要做的事
+                Toast.makeText(MainActivity.this, "首頁", Toast.LENGTH_SHORT).show();
+                return true;
             }
+            else if (id == R.id.nav_message) {
+                Toast.makeText(MainActivity.this, "詳細說明", Toast.LENGTH_SHORT).show();
+            }
+            else if (id == R.id.nav_help) {
+                Toast.makeText(MainActivity.this, "幫助", Toast.LENGTH_LONG).show();
+            }
+            else if (id == R.id.nav_setting) {
+                // 按下「使用說明」要做的事
+                Toast.makeText(MainActivity.this, "設定", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            return false;
         });
     }
 
+
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    return inflater.inflate(R.layout.activity_main, container, false);
+    }
+    
 }
