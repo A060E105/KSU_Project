@@ -25,15 +25,15 @@
             <TextView
                 android:id="@+id/tv_1"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="20dp"
                 android:text="左邊"
-                android:textSize="30sp" />
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/tv_2"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="40dp"
                 android:layout_marginTop="30dp"
                 android:gravity="center"
                 android:text="距離"
@@ -42,7 +42,7 @@
             <TextView
                 android:id="@+id/tv_3"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="40dp"
                 android:layout_marginTop="30dp"
                 android:gravity="center"
                 android:text="信號強度"
@@ -51,7 +51,7 @@
             <TextView
                 android:id="@+id/tv_4"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="40dp"
                 android:layout_marginTop="30dp"
                 android:gravity="center"
                 android:text="晶片溫度"
@@ -64,9 +64,9 @@
             <TextView
                 android:id="@+id/tv_5"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="30dp"
                 android:text="右邊"
-                android:textSize="30sp" />
+                android:textSize="24sp" />
 
             <Space
                 android:layout_width="match_parent"
@@ -75,7 +75,7 @@
             <TextView
                 android:id="@+id/tv_6"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="40dp"
                 android:gravity="center"
                 android:text="距離"
                 android:textSize="24sp" />
@@ -87,7 +87,7 @@
             <TextView
                 android:id="@+id/tv_7"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="40dp"
                 android:gravity="center"
                 android:text="信號強度"
                 android:textSize="24sp" />
@@ -99,7 +99,7 @@
             <TextView
                 android:id="@+id/tv_8"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="40dp"
                 android:gravity="center"
                 android:text="晶片溫度"
                 android:textSize="24sp" />
@@ -115,12 +115,12 @@
             <TextView
                 android:id="@+id/tv_9"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:layout_marginTop="100dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="80dp"
                 android:gravity="center"
                 android:text="100cm"
                 android:textAllCaps="false"
-                android:textSize="36sp" />
+                android:textSize="30sp" />
 
             <Space
                 android:layout_width="match_parent"
@@ -129,10 +129,10 @@
             <TextView
                 android:id="@+id/tv_10"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="40dp"
                 android:gravity="center"
                 android:text="100"
-                android:textSize="36sp" />
+                android:textSize="30sp" />
 
             <Space
                 android:layout_width="match_parent"
@@ -141,46 +141,46 @@
             <TextView
                 android:id="@+id/tv_11"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="40dp"
                 android:gravity="center"
                 android:text="100"
-                android:textSize="36sp" />
+                android:textSize="30sp" />
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="101dp" />
+                android:layout_height="92dp" />
 
             <TextView
                 android:id="@+id/tv_12"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="40dp"
                 android:gravity="center"
                 android:text="100cm"
-                android:textSize="36sp" />
+                android:textSize="30sp" />
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="21dp" />
+                android:layout_height="20dp" />
 
             <TextView
                 android:id="@+id/tv_13"
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="40dp"
                 android:gravity="center"
                 android:text="100"
-                android:textSize="36sp" />
+                android:textSize="30sp" />
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="21dp" />
+                android:layout_height="19.5dp" />
 
             <TextView
                 android:id="@+id/tv_14"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="40dp"
                 android:gravity="center"
                 android:text="100"
-                android:textSize="36sp" />
+                android:textSize="30sp" />
 
         </LinearLayout>
     </LinearLayout>
