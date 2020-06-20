@@ -24,8 +24,9 @@
             android:layout_height="match_parent"
             android:layout_marginRight="4dp"
             android:layout_weight="1"
+            android:textSize="90dp"
             android:background="@color/colorNormal"
-            android:text="Button" />
+            android:text="100\nCM" />
 
         <Button
             android:id="@+id/button2"
@@ -34,7 +35,8 @@
             android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:background="@color/colorNormal"
-            android:text="Button" />
+            android:textSize="90dp"
+            android:text="150\nCM" />
 
     </LinearLayout>
 

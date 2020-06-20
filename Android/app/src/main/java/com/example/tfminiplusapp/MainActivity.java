@@ -1,34 +1,30 @@
 package com.example.tfminiplusapp;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.GridLayout;
 import android.widget.Toast;
-import androidx.appcompat.widget.Toolbar;
 
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import butterknife.BindView;
 
-import com.example.tfminiplusapp.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.Set;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_ENABLE_BT = 1;
     final Fragment fragment_home = new Fragment_home();
     final Fragment fragment_message = new Fragment_message();
     final Fragment fragment_help = new Fragment_help();
@@ -42,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
        initFragment();
+       bluefunction();
     }
 
     private void initFragment() {
@@ -84,7 +81,41 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void bluefunction() {
 
-    
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        // 驗證是否有藍芽裝置
+        if (mBluetoothAdapter == null) {
+            // device doesn't support Bluetooth
+            Log.d("Bluetooth", "device doesn't support Bluetooth");
+        } else {
+            // device does support Bluetooth
+            Log.d("Bluetooth", "device does support Bluetooth");
+        }
+
+        // 檢查藍芽裝置是否已經開啟，如果沒有開啟，彈出對話方塊讓使用者選擇開啟
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+
+        // 搜尋裝置，查詢已經與本機配對的裝置
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+
+        if (pairedDevices.size() > 0) {
+            Log.d("BluetoothDevice", "get Bonded Devices");
+            for (BluetoothDevice device : pairedDevices) {
+                String deviceName = device.getName();
+                String deviceMACAddress = device.getAddress();
+
+                Log.d("BluetoothDevice name", deviceName);
+                Log.d("BluetoothDevice MAC Address", deviceMACAddress);
+            }
+        } else {
+            Log.d("BluetoothDevice", "not get Bonded Devices");
+        }
+    }
+
     
 }
