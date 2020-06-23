@@ -6,12 +6,24 @@
     android:layout_height="match_parent"
     tools:context=".Fragment_help">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="fragment help"
-        android:textColor="@color/colorTextPrimary"
-        android:textSize="24sp" />
+        android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="97dp"
+            android:background="#84FFFF"
+            android:gravity="center|left"
+            android:text="教學影片"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+
+        <VideoView
+            android:id="@+id/videoView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 </FrameLayout>

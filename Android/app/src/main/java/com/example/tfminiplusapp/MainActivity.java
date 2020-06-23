@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @SuppressLint("LongLogTag")
     public void bluefunction() {
 
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -91,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         if (mBluetoothAdapter == null) {
             // device doesn't support Bluetooth
             Log.d("Bluetooth", "device doesn't support Bluetooth");
+            return;
         } else {
             // device does support Bluetooth
             Log.d("Bluetooth", "device does support Bluetooth");
@@ -119,5 +119,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    
 }

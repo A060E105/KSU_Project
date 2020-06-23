@@ -1,12 +1,19 @@
 package com.example.tfminiplusapp;
 
+//import android.media.session.MediaController;
+import android.widget.MediaController;
+import android.media.session.MediaSession;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.VideoView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,6 +26,7 @@ public class Fragment_help extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+//    public static final Parcelable.Creator<MediaSession.Token> CREATOR;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -53,12 +61,20 @@ public class Fragment_help extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        VideoView videoView = null;
+        videoView = (VideoView) videoView.findViewById(R.id.videoView2);
+        videoView.requestFocus();
+        MediaController mc = new MediaController(getActivity());
+        videoView.setMediaController(mc);
+        videoView.setVideoPath("/raw/vedio.mp4");
+
         return inflater.inflate(R.layout.fragment_help, container, false);
     }
 }
