@@ -1,9 +1,10 @@
 *.iml
 .gradle
 .idea
+local.properties
 /local.properties
 .DS_Store
 /build
 /captures
 .externalNativeBuild
-*.mp4
+app/src/main/res/raw/vedio.mp4
