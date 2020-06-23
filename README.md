@@ -13,3 +13,6 @@ https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
 
 # Android DrawerLayout + Navigation
 https://blog.30sparks.com/material-design-1-navigation-drawer/
+
+# Android Bluetooth
+https://www.itread01.com/content/1547759360.html
