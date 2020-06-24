@@ -6,8 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.media.MediaBrowserCompat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -18,13 +20,18 @@ import butterknife.BindView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.io.IOException;
+import java.io.PipedOutputStream;
 import java.util.Set;
+import java.util.UUID;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
 
+
 public class MainActivity extends AppCompatActivity {
 
+    private final static UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final int REQUEST_ENABLE_BT = 1;
     final Fragment fragment_home = new Fragment_home();
     final Fragment fragment_message = new Fragment_message();
@@ -32,14 +39,25 @@ public class MainActivity extends AppCompatActivity {
     final Fragment fragment_setting = new Fragment_setting();
     FragmentManager fragmentManager = getSupportFragmentManager();
     Fragment active = fragment_home;
+    public boolean bluetooth_flag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       initFragment();
-       bluefunction();
+        initFragment();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bluefunction();
+    }
+
+
+    protected void onResume() {
+        super.onResume();
     }
 
     private void initFragment() {
@@ -113,10 +131,45 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d("BluetoothDevice name", deviceName);
                 Log.d("BluetoothDevice MAC Address", deviceMACAddress);
+                this.bluetooth_flag = true;
             }
         } else {
             Log.d("BluetoothDevice", "not get Bonded Devices");
+            this.bluetooth_flag = false;
+        }
+
+
+        if (this.bluetooth_flag == true) {
+            Toast.makeText(this, "bluetooth Open", LENGTH_SHORT);
+            String macAddr = "30:AE:A4:97:AF:52";
+            BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(macAddr);
+//            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+            BluetoothSocket mSocket;
+            try {
+                mSocket = device.createRfcommSocketToServiceRecord(uuid);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            new Thread() {
+                @Override
+                public void run() {
+                    mBluetoothAdapter.cancelDiscovery();
+                    try {
+                        mSocket.connect();
+                    } catch (IOException e) {
+                        try {
+                            mSocket.close();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                        e.printStackTrace();
+                    }
+                    super.run();
+                }
+            }.start();
+        } else {
+            Toast.makeText(this, "bluetooth Close", LENGTH_SHORT);
         }
     }
-
 }
