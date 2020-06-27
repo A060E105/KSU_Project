@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("LongLogTag")
     public void bluefunction() {
 
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -143,23 +144,27 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "bluetooth Open", LENGTH_SHORT);
             String macAddr = "30:AE:A4:97:AF:52";
             BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(macAddr);
-//            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-            BluetoothSocket mSocket;
+            BluetoothSocket tempSocket = null;
             try {
-                mSocket = device.createRfcommSocketToServiceRecord(uuid);
+                 tempSocket = device.createRfcommSocketToServiceRecord(uuid);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            // 使用 final 宣告，否著後面try會出現錯誤訊息
+            final BluetoothSocket mySocket = tempSocket;
+
             new Thread() {
                 @Override
                 public void run() {
                     mBluetoothAdapter.cancelDiscovery();
                     try {
-                        mSocket.connect();
+                        mySocket.connect();
                     } catch (IOException e) {
                         try {
-                            mSocket.close();
+                            mySocket.close();
                         } catch (IOException e1) {
                             e1.printStackTrace();
                         }
