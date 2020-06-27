@@ -68,12 +68,12 @@ public class Fragment_help extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        VideoView videoView = null;
-        videoView = (VideoView) videoView.findViewById(R.id.videoView2);
-        videoView.requestFocus();
-        MediaController mc = new MediaController(getActivity());
-        videoView.setMediaController(mc);
-        videoView.setVideoPath("/raw/vedio.mp4");
+//        VideoView videoView = null;
+//        videoView = (VideoView) videoView.findViewById(R.id.videoView2);
+//        videoView.requestFocus();
+//        MediaController mc = new MediaController(getActivity());
+//        videoView.setMediaController(mc);
+//        videoView.setVideoPath("/raw/vedio.mp4");
 
         return inflater.inflate(R.layout.fragment_help, container, false);
     }

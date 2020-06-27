@@ -8,4 +8,22 @@
 
     </style>
 
+    <style name="BluetoothConnect" parent="Widget.Design.BottomNavigationView">
+        <item name="backgroundTint">@color/colorBluetoothOFF</item>
+        <item name="itemIconTint">@color/colorBluetoothOFFIcon</item>
+        <item name="itemTextColor">@color/colorBluetoothOFFIcon</item>
+    </style>
+
+    <style name="BluetoothConnect.true">
+        <item name="backgroundTint">@color/colorSuccess</item>
+        <item name="itemIconTint">@color/colorPrimary</item>
+        <item name="itemTextColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="BluetoothConnect.false">
+        <item name="backgroundTint">@color/colorFail</item>
+        <item name="itemIconTint">@color/colorFailIcon</item>
+        <item name="itemTextColor">@color/colorFailIcon</item>
+    </style>
+
 </resources>
