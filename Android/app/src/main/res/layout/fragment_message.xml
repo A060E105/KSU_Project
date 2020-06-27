@@ -30,7 +30,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_1"
+                    android:id="@+id/tv_title_left"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -40,7 +40,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_2"
+                    android:id="@+id/tv_title_left_dist"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -50,7 +50,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_3"
+                    android:id="@+id/tv_title_left_strength"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -60,7 +60,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_4"
+                    android:id="@+id/tv_title_left_temp"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -83,7 +83,7 @@
                     android:layout_weight="1" />
 
                 <TextView
-                    android:id="@+id/tv_9"
+                    android:id="@+id/tv_left_dist"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -94,7 +94,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_10"
+                    android:id="@+id/tv_left_strength"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -104,7 +104,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_11"
+                    android:id="@+id/tv_left_temp"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -130,7 +130,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_5"
+                    android:id="@+id/tv_title_right"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -140,7 +140,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_6"
+                    android:id="@+id/tv_title_right_dist"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -150,7 +150,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_7"
+                    android:id="@+id/tv_title_right_strength"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -160,7 +160,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_8"
+                    android:id="@+id/tv_title_right_temp"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -183,7 +183,7 @@
                     android:layout_weight="1" />
 
                 <TextView
-                    android:id="@+id/tv_12"
+                    android:id="@+id/tv_right_dist"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -193,7 +193,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_13"
+                    android:id="@+id/tv_right_strength"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -203,7 +203,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_14"
+                    android:id="@+id/tv_right_temp"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
