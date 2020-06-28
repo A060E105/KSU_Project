@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.v4.media.MediaBrowserCompat;
 import android.util.Log;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager.beginTransaction().add(R.id.container, fragment_help).hide(fragment_help).commit();
         fragmentManager.beginTransaction().add(R.id.container, fragment_setting).hide(fragment_setting).commit();
 
+        bottomNavigationView_color_status(Bluetooth_Status.bluetooth_not_open);
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -119,6 +121,12 @@ public class MainActivity extends AppCompatActivity {
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            if (mBluetoothAdapter.isEnabled())
+                // 藍芽開啟，尚未連接裝置
+                bottomNavigationView_color_status(Bluetooth_Status.bluetooth_is_open_not_connect);
+            else
+                // 藍芽未開啟
+                bottomNavigationView_color_status(Bluetooth_Status.bluetooth_not_open);
         }
 
         // 搜尋裝置，查詢已經與本機配對的裝置
@@ -149,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
             BluetoothSocket tempSocket = null;
             try {
                  tempSocket = device.createRfcommSocketToServiceRecord(uuid);
+                Log.d("BluetoothDevice", "get UUID");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -160,8 +169,11 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     mBluetoothAdapter.cancelDiscovery();
+                    Log.d("BluetoothSocket", "run: cancelDiscovery");
                     try {
                         mySocket.connect();
+                        Log.d("BluetoothSocket", "run: mySocket.connect");
+                        bottomNavigationView_color_status(Bluetooth_Status.bluetooth_is_connect);
                     } catch (IOException e) {
                         try {
                             mySocket.close();
@@ -175,6 +187,36 @@ public class MainActivity extends AppCompatActivity {
             }.start();
         } else {
             Toast.makeText(this, "bluetooth Close", LENGTH_SHORT);
+        }
+    }
+
+    enum Bluetooth_Status {
+        bluetooth_not_open,
+        bluetooth_is_open_not_connect,
+        bluetooth_is_connect
+    }
+
+    @SuppressLint("ResourceAsColor")
+    public void bottomNavigationView_color_status(Bluetooth_Status status) {
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
+        switch(status) {
+            case bluetooth_not_open:
+                bottomNavigationView.setBackgroundColor(R.color.colorBluetoothOFF);
+                bottomNavigationView.setItemTextColor(ColorStateList.valueOf(R.color.colorBluetoothOFFIcon));
+                bottomNavigationView.setItemIconTintList(ColorStateList.valueOf(R.color.colorBluetoothOFFIcon));
+                break;
+            case bluetooth_is_open_not_connect:
+                bottomNavigationView.setBackgroundColor(R.color.colorFail);
+                bottomNavigationView.setItemTextColor(ColorStateList.valueOf(R.color.colorFailIcon));
+                bottomNavigationView.setItemIconTintList(ColorStateList.valueOf(R.color.colorFailIcon));
+                break;
+            case bluetooth_is_connect:
+                bottomNavigationView.setBackgroundColor(R.color.colorSuccess);
+                bottomNavigationView.setItemTextColor(ColorStateList.valueOf(R.color.colorSuccessIcon));
+                bottomNavigationView.setItemIconTintList(ColorStateList.valueOf(R.color.colorSuccessIcon));
+                break;
+            default:
+                break;
         }
     }
 }
