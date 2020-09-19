@@ -7,6 +7,10 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +27,9 @@ public class Fragment_setting extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private ListView listview;
+    private final String[] str = new String[]{"one", "two", "three"};
 
     public Fragment_setting() {
         // Required empty public constructor
@@ -53,6 +60,11 @@ public class Fragment_setting extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        View view = null;
+        listview = (ListView)listview.findViewById(R.id.setlist);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, str);
+        listview.setAdapter(adapter);
     }
 
     @Override

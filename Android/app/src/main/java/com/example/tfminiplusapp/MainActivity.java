@@ -10,9 +10,13 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.media.MediaBrowserCompat;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -23,6 +27,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
 import java.io.PipedOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,14 +38,24 @@ import static android.widget.Toast.LENGTH_SHORT;
 public class MainActivity extends AppCompatActivity {
 
     private final static UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private static final int REQUEST_ENABLE_BT = 1;
+
+    private final static int REQUEST_ENABLE_BT = 1;
+    public final static int MESSAGE_READ = 2;
+    private final static int CONNECTING_STATUS = 3;
+
     final Fragment fragment_home = new Fragment_home();
     final Fragment fragment_message = new Fragment_message();
     final Fragment fragment_help = new Fragment_help();
     final Fragment fragment_setting = new Fragment_setting();
     FragmentManager fragmentManager = getSupportFragmentManager();
     Fragment active = fragment_home;
-    public boolean bluetooth_flag = false;
+
+    private BluetoothAdapter mBTAdapter;
+    private Set<BluetoothDevice> mPairedDevices;
+    private ArrayAdapter<String> mBTArrayAdapter;
+
+    private Handler mHandler;
+    private BluetoothSocket mBTSocket = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +74,36 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onResume() {
         super.onResume();
+    }
+
+    private boolean isBluetoothSupport() {
+        mBTAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (mBTAdapter == null) {
+            Toast.makeText(this, "Device doesn't support Bluetooth", LENGTH_SHORT).show();
+            return false;
+        } else {
+            Toast.makeText(this, "Device does support Bluetooth", LENGTH_SHORT).show();
+            return true;
+        }
+    }
+
+    private void bluetoothOn() {
+        if (!mBTAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+    }
+
+    private void searchDevices() {
+        mPairedDevices = mBTAdapter.getBondedDevices();
+
+        if (mPairedDevices.size() > 0) {
+            for (BluetoothDevice device : mPairedDevices) {
+                String deviceName = device.getName();
+                String deviceHardwareAddress = device.getAddress();
+            }
+        }
     }
 
     private void initFragment() {
