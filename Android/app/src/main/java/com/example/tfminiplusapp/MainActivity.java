@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager.beginTransaction().add(R.id.container, fragment_help).hide(fragment_help).commit();
         fragmentManager.beginTransaction().add(R.id.container, fragment_setting).hide(fragment_setting).commit();
 
-        bottomNavigationView_color_status(Bluetooth_Status.bluetooth_not_open);
+//        bottomNavigationView_color_status(Bluetooth_Status.bluetooth_not_open);
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -121,12 +121,13 @@ public class MainActivity extends AppCompatActivity {
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            if (mBluetoothAdapter.isEnabled())
+            if (mBluetoothAdapter.isEnabled()) {
                 // 藍芽開啟，尚未連接裝置
-                bottomNavigationView_color_status(Bluetooth_Status.bluetooth_is_open_not_connect);
-            else
+//                bottomNavigationView_color_status(Bluetooth_Status.bluetooth_is_open_not_connect);
+            } else {
                 // 藍芽未開啟
-                bottomNavigationView_color_status(Bluetooth_Status.bluetooth_not_open);
+//                bottomNavigationView_color_status(Bluetooth_Status.bluetooth_not_open);
+            }
         }
 
         // 搜尋裝置，查詢已經與本機配對的裝置
@@ -173,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         mySocket.connect();
                         Log.d("BluetoothSocket", "run: mySocket.connect");
-                        bottomNavigationView_color_status(Bluetooth_Status.bluetooth_is_connect);
+//                        bottomNavigationView_color_status(Bluetooth_Status.bluetooth_is_connect);
                     } catch (IOException e) {
                         try {
                             mySocket.close();
