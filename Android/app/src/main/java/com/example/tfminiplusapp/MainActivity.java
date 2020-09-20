@@ -8,26 +8,18 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.support.v4.media.MediaBrowserCompat;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import butterknife.BindView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.IOException;
-import java.io.PipedOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -51,11 +43,11 @@ public class MainActivity extends AppCompatActivity {
     Fragment active = fragment_home;
 
     private BluetoothAdapter mBTAdapter;
-    private Set<BluetoothDevice> mPairedDevices;
-    private ArrayAdapter<String> mBTArrayAdapter;
+    private BluetoothDevice mPairedDevices;
+    private ConnectedThread mConnectedThread;
 
     private Handler mHandler;
-    private BluetoothSocket mBTSocket = null;
+    private BluetoothSocket mBTSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +55,34 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initFragment();
+
+        if (isBluetoothSupport()) {
+            bluetoothOn();
+            boolean fail = false;
+            try {
+                mBTSocket = createBluetoothSocket(mPairedDevices);
+                try {
+                    mBTSocket.connect();
+                } catch (IOException e) {
+                    try {
+                        fail = true;
+                        mBTSocket.close();
+                        mHandler.obtainMessage(CONNECTING_STATUS, -1, -1).sendToTarget();
+                    } catch (IOException e2) {
+                        Toast.makeText(this, "Socket creation failed", LENGTH_SHORT).show();
+                    }
+                }
+
+                if(!fail) {
+                    mConnectedThread = new ConnectedThread(mBTSocket, mHandler);
+                    mConnectedThread.start();
+
+                    mHandler.obtainMessage(CONNECTING_STATUS, 1, -1, "name").sendToTarget();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -95,15 +115,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void searchDevices() {
-        mPairedDevices = mBTAdapter.getBondedDevices();
+//    private void searchDevices() {
+//        mPairedDevices = mBTAdapter.getBondedDevices();
+//
+//        if (mPairedDevices.size() > 0) {
+//            for (BluetoothDevice device : mPairedDevices) {
+//                String deviceName = device.getName();
+//                String deviceHardwareAddress = device.getAddress();
+//            }
+//        }
+//    }
 
-        if (mPairedDevices.size() > 0) {
-            for (BluetoothDevice device : mPairedDevices) {
-                String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress();
-            }
+    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
+        String macAddr = "30:AE:A4:97:AF:52";
+        try {
+            device = mBTAdapter.getRemoteDevice(macAddr);
+        } catch (Exception e) {
+            Log.e("Bluetooth:", "Could not create Insecure RFComm Connection", e);
         }
+        return device.createInsecureRfcommSocketToServiceRecord(uuid);
     }
 
     private void initFragment() {

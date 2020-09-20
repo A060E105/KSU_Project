@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -60,17 +61,27 @@ public class Fragment_setting extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
-        View view = null;
-        listview = (ListView)listview.findViewById(R.id.setlist);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, str);
-        listview.setAdapter(adapter);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_setting, container, false);
+        View view =  inflater.inflate(R.layout.fragment_setting, container, false);
+
+        ArrayList<String> data = new ArrayList<>();
+        data.add("設定藍芽名稱");
+        data.add("設定距離值");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                getContext(),
+                android.R.layout.simple_list_item_1,
+                data
+        );
+
+        ListView lvset = (ListView) view.findViewById(R.id.lvset);
+        lvset.setAdapter(adapter);
+
+        return view;
     }
 }
