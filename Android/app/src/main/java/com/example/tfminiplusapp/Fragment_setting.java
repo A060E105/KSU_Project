@@ -1,17 +1,27 @@
 package com.example.tfminiplusapp;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,6 +41,9 @@ public class Fragment_setting extends Fragment {
 
     private ListView listview;
     private final String[] str = new String[]{"one", "two", "three"};
+
+    AlertDialog.Builder dialogBuilder;
+    AlertDialog dialog;
 
     public Fragment_setting() {
         // Required empty public constructor
@@ -61,6 +74,9 @@ public class Fragment_setting extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+
+
     }
 
     @Override
@@ -82,6 +98,48 @@ public class Fragment_setting extends Fragment {
         ListView lvset = (ListView) view.findViewById(R.id.lvset);
         lvset.setAdapter(adapter);
 
+        lvset.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView arg0, View arg1, int pos,
+                                    long index) {
+                // TODO Auto-generated method stub
+                ListView listView = (ListView) arg0;
+                Toast.makeText(
+                        getContext(),
+                        "ID：" + index +
+                                "   選單文字："+ listView.getItemAtPosition(pos).toString(),
+                        Toast.LENGTH_SHORT).show();
+                switch ((int) index) {
+                    case 0:
+//                        Toast.makeText(getContext(), "你按了第一個", Toast.LENGTH_SHORT).show();
+                        LayoutInflater inflater=getLayoutInflater();
+                        View view=inflater.inflate(R.layout.change_bluetooth_name, null);
+                        dialogBuilder = new AlertDialog.Builder(getContext());
+                        dialogBuilder.setTitle("藍芽名稱")
+                                .setView(view)
+                                .setPositiveButton("確定", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        View v = inflater.inflate(R.layout.fragment_setting, container, false);
+                                        EditText editText = (EditText) (v.findViewById(R.id.ed_btName));
+                                        Toast.makeText(getContext(), "你的id是" +
+                                                editText.getText().toString(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                        dialog = dialogBuilder.show();
+                        break;
+                    case 1:
+//                        Toast.makeText(getContext(), "你按了第二個", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        });
+
+
         return view;
     }
+
+
+
 }
