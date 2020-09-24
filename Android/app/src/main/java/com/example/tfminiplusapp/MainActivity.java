@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -17,10 +18,12 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,14 +63,24 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter mBTAdapter;
     private Set<BluetoothDevice> mPairedDevices;
     private ConnectedThread mConnectedThread;
+    private ListView myListView;
 
     private Handler mHandler;
     private BluetoothSocket mBTSocket;
+
+    AlertDialog.Builder dialogBuilder;
+    AlertDialog dialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mBTArrayAdapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1);
+        myListView = (ListView)findViewById(R.id.listview);
+        myListView.setAdapter(mBTArrayAdapter);
+        myListView.setOnItemClickListener(mDeviceClickListener);
 
         initFragment();
 
@@ -150,13 +163,17 @@ public class MainActivity extends AppCompatActivity {
         if (mBTAdapter.isEnabled()) {
             Toast.makeText(this, "Bluetooth is open", LENGTH_SHORT).show();
             Log.d(TAG, "bluetoothOn: Bluetooth is open");
+            listPairedDevices();
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.listview, null);
+            dialogBuilder.setTitle("select device").setView(view).show();
         }
     }
 
     private void bluetoothOff() {
         mBTAdapter.disable();
         Log.d(TAG, "bluetoothOff: ");
-        Toast.makeText(MainActivity.this, "Bluetooth turned off", LENGTH_SHORT);
+        Toast.makeText(MainActivity.this, "Bluetooth turned off", LENGTH_SHORT).show();
         Log.d(TAG, "bluetoothOff: Bluetooth turned off");
     }
 
@@ -196,8 +213,9 @@ public class MainActivity extends AppCompatActivity {
         mBTArrayAdapter.clear();
         mPairedDevices = mBTAdapter.getBondedDevices();
         if (mBTAdapter.isEnabled()) {
-            for (BluetoothDevice device : mPairedDevices)
+            for (BluetoothDevice device : mPairedDevices) {
                 mBTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+            }
             Toast.makeText(MainActivity.this, "Show Paired Devices", LENGTH_SHORT).show();
             Log.d(TAG, "listPairedDevices: Show Paired Devices");
         } else {
@@ -264,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
             final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", UUID.class);
             return (BluetoothSocket) m.invoke(device, uuid);
         } catch (Exception e) {
-            Log.e("Bluetooth:", "Could not create Insecure RFComm Connection", e);
+            Log.e(TAG, "Could not create Insecure RFComm Connection", e);
         }
         return device.createInsecureRfcommSocketToServiceRecord(uuid);
     }

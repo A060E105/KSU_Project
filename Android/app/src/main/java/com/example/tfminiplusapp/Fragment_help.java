@@ -1,19 +1,12 @@
 package com.example.tfminiplusapp;
 
-//import android.media.session.MediaController;
-import android.widget.MediaController;
-import android.media.session.MediaSession;
-import android.os.Build;
 import android.os.Bundle;
 
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.VideoView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,12 +61,6 @@ public class Fragment_help extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-//        VideoView videoView = null;
-//        videoView = (VideoView) videoView.findViewById(R.id.videoView2);
-//        videoView.requestFocus();
-//        MediaController mc = new MediaController(getActivity());
-//        videoView.setMediaController(mc);
-//        videoView.setVideoPath("/raw/vedio.mp4");
 
         return inflater.inflate(R.layout.fragment_help, container, false);
     }
