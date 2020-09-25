@@ -9,6 +9,7 @@
 #define HEADER 0x59
 #define L_LED 18
 #define R_LED 19
+#define MIN 10
 
 StaticJsonDocument<200> jsondata;
 
@@ -17,7 +18,7 @@ BluetoothSerial BT;			// Bluetooth
 HardwareSerial L_TFmini(1);			// Left TFmini Plus
 HardwareSerial R_TFmini(2);			// Right TFmini Plus
 
-const int distance = 100;			// Set distance value
+const int distance = 300;			// Set distance value
 
 // TFmini plus data struct
 struct TFdata{
@@ -114,14 +115,14 @@ void led_Status(int pin, int status)
 void warning(TFdata *pL_TFdata, TFdata *pR_TFdata)
 {
 	// Left
-	if (pL_TFdata->dist <= distance) {
+	if ((pL_TFdata->dist > MIN) && (pL_TFdata->dist <= distance)) {
 		led_Status(L_LED, HIGH);
 	} else {
 		led_Status(L_LED, LOW);
 	}
 
 	// Right
-	if (pR_TFdata->dist <= distance) {
+	if ((pR_TFdata->dist > MIN) && (pR_TFdata->dist <= distance)) {
 		led_Status(R_LED, HIGH);
 	} else {
 		led_Status(R_LED, LOW);
