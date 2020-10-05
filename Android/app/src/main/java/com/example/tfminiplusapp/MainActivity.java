@@ -3,7 +3,6 @@ package com.example.tfminiplusapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -16,13 +15,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,11 +31,17 @@ import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.zip.Inflater;
 
 import static android.bluetooth.BluetoothDevice.EXTRA_DEVICE;
 import static android.widget.Toast.LENGTH_SHORT;
@@ -63,13 +68,12 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter mBTAdapter;
     private Set<BluetoothDevice> mPairedDevices;
     private ConnectedThread mConnectedThread;
-    private ListView myListView;
 
     private Handler mHandler;
     private BluetoothSocket mBTSocket;
 
-    AlertDialog.Builder dialogBuilder;
-    AlertDialog dialog;
+
+    AlertDialog alert;
 
 
     @Override
@@ -77,11 +81,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mBTArrayAdapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1);
-        myListView = (ListView)findViewById(R.id.listview);
-        myListView.setAdapter(mBTArrayAdapter);
-        myListView.setOnItemClickListener(mDeviceClickListener);
 
+        mBTArrayAdapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1);
         initFragment();
 
         mHandler = new Handler(Looper.getMainLooper()) {
@@ -94,8 +95,9 @@ public class MainActivity extends AppCompatActivity {
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
-                    Toast.makeText(MainActivity.this, readMessage, LENGTH_SHORT).show();
-                    Log.d(TAG, "handleMessage: " + readMessage);
+//                    Toast.makeText(MainActivity.this, readMessage, LENGTH_SHORT).show();
+//                    Log.d(TAG, "handleMessage: " + readMessage);
+                    to_JSON(splitData(readMessage));
                 }
 
                 if (msg.what == CONNECTING_STATUS) {
@@ -110,8 +112,15 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        // check device is support bluetooth
         if (isBluetoothSupport()) {
-            bluetoothOn();
+            // check bluetooth is Enable
+            if (!mBTAdapter.isEnabled()) {
+                bluetoothOn();
+            } else {
+                listPairedDevices();
+                showAlert();
+            }
         }
     }
 
@@ -121,10 +130,14 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == REQUEST_ENABLE_BT) {
             if (resultCode == RESULT_OK) {
-                Toast.makeText(this, "Enable", LENGTH_SHORT).show();
+                Toast.makeText(this, "ActivityResult Enable", LENGTH_SHORT).show();
                 Log.d(TAG, "onActivityResult: Enable");
+                if (mBTAdapter.isEnabled()) {
+                    listPairedDevices();
+                    showAlert();
+                }
             } else {
-                Toast.makeText(this, "Disabled", LENGTH_SHORT).show();
+                Toast.makeText(this, "ActivityResult Disabled", LENGTH_SHORT).show();
                 Log.d(TAG, "onActivityResult: Disabled");
             }
         }
@@ -133,12 +146,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        bluefunction();
     }
 
 
     protected void onResume() {
         super.onResume();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        bluetoothOff();
     }
 
     private boolean isBluetoothSupport() {
@@ -163,16 +182,11 @@ public class MainActivity extends AppCompatActivity {
         if (mBTAdapter.isEnabled()) {
             Toast.makeText(this, "Bluetooth is open", LENGTH_SHORT).show();
             Log.d(TAG, "bluetoothOn: Bluetooth is open");
-            listPairedDevices();
-            LayoutInflater inflater = getLayoutInflater();
-            View view = inflater.inflate(R.layout.listview, null);
-            dialogBuilder.setTitle("select device").setView(view).show();
         }
     }
 
     private void bluetoothOff() {
         mBTAdapter.disable();
-        Log.d(TAG, "bluetoothOff: ");
         Toast.makeText(MainActivity.this, "Bluetooth turned off", LENGTH_SHORT).show();
         Log.d(TAG, "bluetoothOff: Bluetooth turned off");
     }
@@ -224,14 +238,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void showAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+        LayoutInflater inflater = getLayoutInflater();
+        View converView = (View) inflater.inflate(R.layout.listview, null);
+        alertDialog.setView(converView);
+        alertDialog.setTitle("Devices");
+        ListView  lv_devices = (ListView) converView.findViewById(R.id.lv_devices);
+        lv_devices.setAdapter(mBTArrayAdapter);
+        lv_devices.setOnItemClickListener(mDeviceClickListener);
+        alert = alertDialog.create();
+        alertDialog.show();
+    }
+
     private AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            alert.cancel();
             if (!mBTAdapter.isEnabled()) {
                 Toast.makeText(MainActivity.this, "Bluetooth not on", LENGTH_SHORT).show();
                 Log.d(TAG, "onItemClick: Bluetootn not on");
                 return;
             }
+
 
             Log.d(TAG, "onItemClick: Connecting ");
             String info = ((TextView) view).getText().toString();
@@ -328,91 +357,68 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @SuppressLint("LongLogTag")
-    public void bluefunction() {
-//        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-//
-//        // 驗證是否有藍芽裝置
-//        if (mBluetoothAdapter == null) {
-//            // device doesn't support Bluetooth
-//            Log.d("Bluetooth", "device doesn't support Bluetooth");
-//            return;
-//        } else {
-//            // device does support Bluetooth
-//            Log.d("Bluetooth", "device does support Bluetooth");
-//        }
-//
-//        // 檢查藍芽裝置是否已經開啟，如果沒有開啟，彈出對話方塊讓使用者選擇開啟
-//        if (!mBluetoothAdapter.isEnabled()) {
-//            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-//            if (mBluetoothAdapter.isEnabled()) {
-//                // 藍芽開啟，尚未連接裝置
-////                bottomNavigationView_color_status(Bluetooth_Status.bluetooth_is_open_not_connect);
-//            } else {
-//                // 藍芽未開啟
-////                bottomNavigationView_color_status(Bluetooth_Status.bluetooth_not_open);
-//            }
-//        }
-//
-//        // 搜尋裝置，查詢已經與本機配對的裝置
-//        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-//
-//        if (pairedDevices.size() > 0) {
-//            Log.d("BluetoothDevice", "get Bonded Devices");
-//            for (BluetoothDevice device : pairedDevices) {
-//                String deviceName = device.getName();
-//                String deviceMACAddress = device.getAddress();
-//
-//                Log.d("BluetoothDevice name", deviceName);
-//                Log.d("BluetoothDevice MAC Address", deviceMACAddress);
-//                this.bluetooth_flag = true;
-//            }
-//        } else {
-//            Log.d("BluetoothDevice", "not get Bonded Devices");
-//            this.bluetooth_flag = false;
-//        }
-//
-//
-//        if (this.bluetooth_flag == true) {
-//            Toast.makeText(this, "bluetooth Open", LENGTH_SHORT);
-//            String macAddr = "30:AE:A4:97:AF:52";
-//            BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(macAddr);
-//            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-//
-//            BluetoothSocket tempSocket = null;
-//            try {
-//                 tempSocket = device.createRfcommSocketToServiceRecord(uuid);
-//                Log.d("BluetoothDevice", "get UUID");
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            // 使用 final 宣告，否著後面try會出現錯誤訊息
-//            final BluetoothSocket mySocket = tempSocket;
-//
-//            new Thread() {
-//                @Override
-//                public void run() {
-//                    mBluetoothAdapter.cancelDiscovery();
-//                    Log.d("BluetoothSocket", "run: cancelDiscovery");
-//                    try {
-//                        mySocket.connect();
-//                        Log.d("BluetoothSocket", "run: mySocket.connect");
-////                        bottomNavigationView_color_status(Bluetooth_Status.bluetooth_is_connect);
-//                    } catch (IOException e) {
-//                        try {
-//                            mySocket.close();
-//                        } catch (IOException e1) {
-//                            e1.printStackTrace();
-//                        }
-//                        e.printStackTrace();
-//                    }
-//                    super.run();
-//                }
-//            }.start();
-//        } else {
-//            Toast.makeText(this, "bluetooth Close", LENGTH_SHORT);
-//        }
+    private String splitData(String str) {
+        String data = new String(str);
+        int start = data.indexOf("{\"L\":");
+        int end = data.lastIndexOf("}}") + 2;
+        if (start > end) {
+            String[] array = data.split("}}", 1);
+            data = array[1];
+            start = data.indexOf("{\"L\":");
+            end = data.lastIndexOf("}}") + 2;
+        }
+        if (end - start >= 100) {
+            data = data.substring(start, end);
+            start = data.indexOf("{\"L\":");
+            end = data.indexOf("}}") + 2;
+        }
+        data = data.substring(start, end);
+//        Log.d(TAG, "splitData: sbustring => " + data);
+        return data;
+    }
+
+    private void to_JSON(String str) {
+        try {
+            JSONObject jsonobject = new JSONObject(str);
+//            Log.d(TAG, "to_JSON: " + jsonobject);
+            Log.d(TAG, "to_JSON: left dist => " + jsonobject.getJSONObject("L").getString("dist"));
+            Log.d(TAG, "to_JSON: right dist => " + jsonobject.getJSONObject("R").getString("dist"));
+            JSONObject left = new JSONObject(jsonobject.getString("L"));
+            JSONObject right = new JSONObject(jsonobject.getString("R"));
+            Log.d(TAG, "to_JSON: left" + left);
+            Log.d(TAG, "to_JSON: right" + right);
+            String L_dist = left.getString("dist");
+            String L_strength = left.getString("strength");
+            String L_temp = left.getString("temp");
+            String R_dist = right.getString("dist");
+            String R_strength = right.getString("strength");
+            String R_temp = right.getString("temp");
+            display(L_dist, L_strength, L_temp, R_dist, R_strength, R_temp);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void display(String L_dist, String L_strength, String L_temp, String R_dist, String R_strength, String R_temp) {
+        // fragment_home
+        Button btn_left = (Button)findViewById(R.id.btn_left);
+        Button btn_right = (Button)findViewById(R.id.btn_right);
+        btn_left.setText(L_dist + "\nCM");
+        btn_right.setText(R_dist + "\nCM");
+        // fragment_message left
+        TextView tv_L_dist = (TextView)findViewById(R.id.tv_L_dist);
+        TextView tv_L_strength = (TextView)findViewById(R.id.tv_L_strength);
+        TextView tv_L_temp = (TextView)findViewById(R.id.tv_L_temp);
+        tv_L_dist.setText(L_dist + "cm");
+        tv_L_strength.setText(L_strength);
+        tv_L_temp.setText(L_temp);
+        // fragment_message right
+        TextView tv_R_dist = (TextView)findViewById(R.id.tv_R_dist);
+        TextView tv_R_strength = (TextView)findViewById(R.id.tv_R_strength);
+        TextView tv_R_temp = (TextView)findViewById(R.id.tv_R_temp);
+        tv_R_dist.setText(R_dist + "cm");
+        tv_R_strength.setText(R_strength);
+        tv_R_temp.setText(R_temp);
     }
 }
+

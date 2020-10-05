@@ -83,7 +83,7 @@
                     android:layout_weight="1" />
 
                 <TextView
-                    android:id="@+id/tv_9"
+                    android:id="@+id/tv_L_dist"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -94,7 +94,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_10"
+                    android:id="@+id/tv_L_strength"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -104,7 +104,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_11"
+                    android:id="@+id/tv_L_temp"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -183,7 +183,7 @@
                     android:layout_weight="1" />
 
                 <TextView
-                    android:id="@+id/tv_12"
+                    android:id="@+id/tv_R_dist"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -193,7 +193,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_13"
+                    android:id="@+id/tv_R_strength"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -203,7 +203,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tv_14"
+                    android:id="@+id/tv_R_temp"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"

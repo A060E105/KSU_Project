@@ -7,6 +7,8 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,7 +44,7 @@ public class ConnectedThread extends Thread {
     }
 
     public void run() {
-        mmBuffer = new byte[1024];
+        mmBuffer = new byte[200];
         int numBytes;
 
         while (true) {
@@ -72,4 +74,5 @@ public class ConnectedThread extends Thread {
             Log.e(TAG, "Could not close the connect socket", e);
         }
     }
+
 }

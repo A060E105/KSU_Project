@@ -40,7 +40,6 @@ public class Fragment_setting extends Fragment {
     private String mParam2;
 
     private ListView listview;
-    private final String[] str = new String[]{"one", "two", "three"};
 
     AlertDialog.Builder dialogBuilder;
     AlertDialog dialog;
@@ -87,7 +86,8 @@ public class Fragment_setting extends Fragment {
 
         ArrayList<String> data = new ArrayList<>();
         data.add("設定藍芽名稱");
-        data.add("設定距離值");
+        data.add("設定靈敏度");
+        data.add("選擇藍芽裝置");
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 getContext(),
@@ -132,6 +132,11 @@ public class Fragment_setting extends Fragment {
                     case 1:
 //                        Toast.makeText(getContext(), "你按了第二個", Toast.LENGTH_SHORT).show();
                         break;
+                    case 2:
+//                        MainActivity.showAlert();
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + (int) index);
                 }
             }
         });

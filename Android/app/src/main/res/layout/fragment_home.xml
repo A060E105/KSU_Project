@@ -19,24 +19,22 @@
 
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/btn_left"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginRight="4dp"
             android:layout_weight="1"
             android:textSize="90dp"
-            android:background="@color/colorNormal"
-            android:text="100\nCM" />
+            android:background="@color/colorNormal" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btn_right"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
             android:layout_weight="1"
             android:background="@color/colorNormal"
-            android:textSize="90dp"
-            android:text="150\nCM" />
+            android:textSize="90dp" />
 
     </LinearLayout>
 
