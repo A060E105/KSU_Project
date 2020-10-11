@@ -151,4 +151,5 @@ void loop(void)
 	ReadTFmini(&L_TFmini, &L_TFdata);		// Read Left TFmini plus data
 	sendJSON(&L_TFdata, &R_TFdata);			// data to json and send
 	warning(&L_TFdata, &R_TFdata);			// Distance Too close warning
+    delay(10);
 }
