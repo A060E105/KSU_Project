@@ -34,16 +34,18 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.zip.Inflater;
 
-import static android.bluetooth.BluetoothDevice.EXTRA_DEVICE;
 import static android.widget.Toast.LENGTH_SHORT;
 
 
@@ -118,8 +120,14 @@ public class MainActivity extends AppCompatActivity {
             if (!mBTAdapter.isEnabled()) {
                 bluetoothOn();
             } else {
-                listPairedDevices();
-                showAlert();
+                String address = load();
+                Log.d(TAG, "onCreate: load address " + address);
+                if (address != null) {
+                    connectBluetooth(address);
+                } else {
+                    listPairedDevices();
+                    showAlert();
+                }
             }
         }
     }
@@ -133,8 +141,14 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "ActivityResult Enable", LENGTH_SHORT).show();
                 Log.d(TAG, "onActivityResult: Enable");
                 if (mBTAdapter.isEnabled()) {
-                    listPairedDevices();
-                    showAlert();
+                    String address = load();
+                    Log.d(TAG, "onCreate: load address " + address);
+                    if (address != null) {
+                        connectBluetooth(address);
+                    } else {
+                        listPairedDevices();
+                        showAlert();
+                    }
                 }
             } else {
                 Toast.makeText(this, "ActivityResult Disabled", LENGTH_SHORT).show();
@@ -273,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
                     boolean fail = false;
 
                     BluetoothDevice device = mBTAdapter.getRemoteDevice(address);
+                    save(address);
 
                     try {
                         mBTSocket = createBluetoothSocket(device);
@@ -419,6 +434,91 @@ public class MainActivity extends AppCompatActivity {
         tv_R_dist.setText(R_dist + "cm");
         tv_R_strength.setText(R_strength);
         tv_R_temp.setText(R_temp);
+    }
+
+    public void save(String address) {
+        FileOutputStream output = null;
+        BufferedWriter writer = null;
+
+        try {
+            output = openFileOutput("data", Context.MODE_PRIVATE);
+            writer = new BufferedWriter(new OutputStreamWriter(output));
+            writer.write(address);
+            Log.d(TAG, "save: save address");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public String load() {
+        FileInputStream input = null;
+        BufferedReader reader = null;
+        StringBuilder address = new StringBuilder();
+
+        try {
+            input = openFileInput("data");
+            reader = new BufferedReader(new InputStreamReader(input));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                address.append(line);
+            }
+            Log.d(TAG, "load: load address");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return address.toString();
+    }
+
+    public void connectBluetooth(String address) {
+        boolean fail = false;
+
+        BluetoothDevice device = mBTAdapter.getRemoteDevice(address);
+        save(address);
+
+        try {
+            mBTSocket = createBluetoothSocket(device);
+        } catch (IOException e) {
+            fail = true;
+            Toast.makeText(MainActivity.this, "Socket creation failed", LENGTH_SHORT).show();
+            Log.e(TAG, "Socket creation failed");
+        }
+
+        try {
+            mBTSocket.connect();
+        } catch (IOException e) {
+            try {
+                fail = true;
+                mBTSocket.close();
+                mHandler.obtainMessage(CONNECTING_STATUS, -1, -1).sendToTarget();
+            } catch (IOException e2) {
+                Toast.makeText(MainActivity.this, "Socket creation failed", LENGTH_SHORT).show();
+                Log.e(TAG, "Socket creation failed");
+            }
+        }
+
+        if (!fail) {
+            mConnectedThread = new ConnectedThread(mBTSocket, mHandler);
+            mConnectedThread.start();
+
+//            mHandler.obtainMessage(CONNECTING_STATUS, 1, -1, name).sendToTarget();
+        }
+
     }
 }
 
