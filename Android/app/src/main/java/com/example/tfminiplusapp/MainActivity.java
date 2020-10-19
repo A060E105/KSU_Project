@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
     private final static UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    public static boolean destroyFlag = true;
+
     private final static int REQUEST_ENABLE_BT = 1;
     public final static int MESSAGE_READ = 2;
     private final static int CONNECTING_STATUS = 3;
@@ -82,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         mBTArrayAdapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1);
         initFragment();
@@ -171,7 +172,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        bluetoothOff();
+
+        if (destroyFlag == true) {
+            bluetoothOff();
+        } else {
+            destroyFlag = true;
+        }
     }
 
     private boolean isBluetoothSupport() {
@@ -489,7 +495,6 @@ public class MainActivity extends AppCompatActivity {
         boolean fail = false;
 
         BluetoothDevice device = mBTAdapter.getRemoteDevice(address);
-        save(address);
 
         try {
             mBTSocket = createBluetoothSocket(device);

@@ -1,7 +1,11 @@
 package com.example.tfminiplusapp;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -17,10 +21,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import static android.widget.Toast.LENGTH_SHORT;
 
 
 /**
@@ -29,6 +41,8 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class Fragment_setting extends Fragment {
+
+    private final String TAG = MainActivity.class.getSimpleName() + " setting";
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -41,8 +55,13 @@ public class Fragment_setting extends Fragment {
 
     private ListView listview;
 
+    AlertDialog alert;
     AlertDialog.Builder dialogBuilder;
     AlertDialog dialog;
+
+    private ArrayAdapter<String> mBTArrayAdapter;
+    private BluetoothAdapter mBTAdapter;
+    private Set<BluetoothDevice> mPairedDevices;
 
     public Fragment_setting() {
         // Required empty public constructor
@@ -74,8 +93,7 @@ public class Fragment_setting extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-
-
+        mBTArrayAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1);
     }
 
     @Override
@@ -104,11 +122,11 @@ public class Fragment_setting extends Fragment {
                                     long index) {
                 // TODO Auto-generated method stub
                 ListView listView = (ListView) arg0;
-                Toast.makeText(
-                        getContext(),
-                        "ID：" + index +
-                                "   選單文字："+ listView.getItemAtPosition(pos).toString(),
-                        Toast.LENGTH_SHORT).show();
+//                Toast.makeText(
+//                        getContext(),
+//                        "ID：" + index +
+//                                "   選單文字："+ listView.getItemAtPosition(pos).toString(),
+//                        Toast.LENGTH_SHORT).show();
                 switch ((int) index) {
                     case 0:
 //                        Toast.makeText(getContext(), "你按了第一個", Toast.LENGTH_SHORT).show();
@@ -133,7 +151,8 @@ public class Fragment_setting extends Fragment {
 //                        Toast.makeText(getContext(), "你按了第二個", Toast.LENGTH_SHORT).show();
                         break;
                     case 2:
-//                        MainActivity.showAlert();
+                        listPairedDevices();
+                        showAlert();
                         break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + (int) index);
@@ -145,6 +164,85 @@ public class Fragment_setting extends Fragment {
         return view;
     }
 
+    public void save(String address) {
+        FileOutputStream output = null;
+        BufferedWriter writer = null;
+
+        try {
+            output = getActivity().openFileOutput("data", Context.MODE_PRIVATE);
+            writer = new BufferedWriter(new OutputStreamWriter(output));
+            writer.write(address);
+            Log.d(TAG, "save: save address");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 
+    private void listPairedDevices() {
+        mBTArrayAdapter.clear();
+        mBTAdapter = BluetoothAdapter.getDefaultAdapter();
+        mPairedDevices = mBTAdapter.getBondedDevices();
+        if (mBTAdapter.isEnabled()) {
+            for (BluetoothDevice device : mPairedDevices) {
+                mBTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+            }
+            Toast.makeText(getActivity(), "Show Paired Devices", LENGTH_SHORT).show();
+            Log.d(TAG, "listPairedDevices: Show Paired Devices");
+        } else {
+            Toast.makeText(getActivity(), "Bluetooth not on", LENGTH_SHORT).show();
+            Log.d(TAG, "listPairedDevices: Bluetooth not on");
+        }
+    }
+
+    public void showAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = getLayoutInflater();
+        View converView = (View) inflater.inflate(R.layout.listview, null);
+        alertDialog.setView(converView);
+        alertDialog.setTitle("Devices");
+        ListView  lv_devices = (ListView) converView.findViewById(R.id.lv_devices);
+        lv_devices.setAdapter(mBTArrayAdapter);
+        lv_devices.setOnItemClickListener(mDeviceClickListener);
+        alert = alertDialog.create();
+        alertDialog.show();
+    }
+
+    private AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            alert.cancel();
+            if (!mBTAdapter.isEnabled()) {
+                Toast.makeText(getActivity(), "Bluetooth not on", LENGTH_SHORT).show();
+                Log.d(TAG, "onItemClick: Bluetootn not on");
+                return;
+            }
+
+            Log.d(TAG, "onItemClick: Save device address");
+            String info = ((TextView) view).getText().toString();
+            final String address = info.substring(info.length() - 17);
+            final String name = info.substring(0, info.length() -17);
+
+            new Thread() {
+                @Override
+                public void run() {
+                    save(address);
+                    Intent intent = getActivity().getIntent();
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK
+                            | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    MainActivity.destroyFlag = false;
+                    getActivity().finish();
+                    startActivity(intent);
+                }
+            }.start();
+        }
+    };
 }
