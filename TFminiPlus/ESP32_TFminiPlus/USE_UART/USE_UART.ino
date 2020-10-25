@@ -5,7 +5,8 @@
 #include <ArduinoJson.h>
 #include <HardwareSerial.h>
 #include <BluetoothSerial.h>
-// #include "esp_system.h"
+#include "TFdata.h"
+#include "esp_system.h"
 
 #define HEADER 0x59
 
@@ -16,7 +17,6 @@ BluetoothSerial BT;                 // Bluetooth
 HardwareSerial L_TFmini(1);         // Left TFmini Plus
 HardwareSerial R_TFmini(2);         // Right TFmini Plus
 
-/*
 const int wdtTimeout = 3000;        // time in ms to trigger the watchdog
 hw_timer_t *timer = NULL;
 
@@ -24,8 +24,8 @@ void IRAM_ATTR resetModule() {
     ets_printf("reboot\n");
     esp_restart();
 }
-*/
 
+/*
 // TFmini plus data struct
 typedef struct {
     const String name;
@@ -33,6 +33,7 @@ typedef struct {
     int strength;
     float temp;
 }TFdata;
+*/
 
 TFdata R_TFdata={"R"};
 TFdata L_TFdata={"L"};
@@ -125,12 +126,10 @@ void setup(void)
     R_TFmini.begin(115200, SERIAL_8N1, 16, 17);     // right TFmini plus sensor.
 
     // watchdog setting
-    /*
     timer = timerBegin(0, 80, true);                    // timer 0, div 80
     timerAttachInterrupt(timer, &resetModule, true);    // attach callback
     timerAlarmWrite(timer, wdtTimeout * 1000, false);   // set time in us
     timerAlarmEnable(timer);                            // enable interrupt
-    */
 
     Serial.println("Start program.");
 }
@@ -138,7 +137,7 @@ void setup(void)
 
 void loop(void)
 {
-    // timerWrite(timer, 0);                   // reset timer (feed watchdog)
+    timerWrite(timer, 0);                   // reset timer (feed watchdog)
     ReadTFmini(&R_TFmini, &R_TFdata);       // Read Right TFmini plus data
     ReadTFmini(&L_TFmini, &L_TFdata);       // Read Left TFmini plus data
     sendJSON(&L_TFdata, &R_TFdata);         // data to json and send
