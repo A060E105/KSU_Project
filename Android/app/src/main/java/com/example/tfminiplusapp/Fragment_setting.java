@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static android.widget.Toast.LENGTH_LONG;
 import static android.widget.Toast.LENGTH_SHORT;
 
 
@@ -103,7 +104,6 @@ public class Fragment_setting extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_setting, container, false);
 
         ArrayList<String> data = new ArrayList<>();
-        data.add("設定藍芽名稱");
         data.add("設定靈敏度");
         data.add("選擇藍芽裝置");
 
@@ -130,27 +130,37 @@ public class Fragment_setting extends Fragment {
                 switch ((int) index) {
                     case 0:
 //                        Toast.makeText(getContext(), "你按了第一個", Toast.LENGTH_SHORT).show();
-                        LayoutInflater inflater=getLayoutInflater();
-                        View view=inflater.inflate(R.layout.change_bluetooth_name, null);
+                        LayoutInflater inflater = getLayoutInflater();
+                        View view = LayoutInflater.from(getContext()).inflate(R.layout.change_bluetooth_name, null);
+                        final EditText dist = (EditText) view.findViewById(R.id.ed_distRange);
                         dialogBuilder = new AlertDialog.Builder(getContext());
-                        dialogBuilder.setTitle("藍芽名稱")
+                        dialogBuilder.setTitle("設定靈敏度")
                                 .setView(view)
                                 .setPositiveButton("確定", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        View v = inflater.inflate(R.layout.fragment_setting, container, false);
-                                        EditText editText = (EditText) (v.findViewById(R.id.ed_btName));
-                                        Toast.makeText(getContext(), "你的id是" +
-                                                editText.getText().toString(), Toast.LENGTH_SHORT).show();
+                                        View v = inflater.inflate(R.layout.change_bluetooth_name, container, false);
+                                        String str = dist.getText().toString();
+                                        if (!str.matches("")) {
+                                            int distRange = Integer.parseInt(str);
+                                            Log.d(TAG, "onClick: dist rnage is " + distRange);
+                                            if (distRange <= 800 && distRange >= 300) {
+                                                // save dist rnage to file
+                                                saveDistRange(distRange);
+                                                MainActivity.Range = distRange;
+//                                                Toast.makeText(getContext(), "將於下次啟動時生效", LENGTH_LONG).show();
+                                            } else {
+                                                Toast.makeText(getContext(), "range is 300 to 800", LENGTH_SHORT).show();
+                                            }
+                                        } else {
+                                            Log.d(TAG, "onClick: dist string is null");
+                                        }
                                     }
                                 });
 
                         dialog = dialogBuilder.show();
                         break;
                     case 1:
-//                        Toast.makeText(getContext(), "你按了第二個", Toast.LENGTH_SHORT).show();
-                        break;
-                    case 2:
                         listPairedDevices();
                         showAlert();
                         break;
@@ -185,6 +195,29 @@ public class Fragment_setting extends Fragment {
             }
         }
     }
+
+    public void saveDistRange(int distRange) {
+        FileOutputStream output = null;
+        BufferedWriter writer = null;
+
+        try {
+            output = getActivity().openFileOutput("distrange", Context.MODE_PRIVATE);
+            writer = new BufferedWriter(new OutputStreamWriter(output));
+            writer.write(String.valueOf(distRange));
+            Log.d(TAG, "save: save dist rnage");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
 
     private void listPairedDevices() {

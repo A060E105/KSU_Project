@@ -11,13 +11,13 @@
             android:orientation="horizontal">
 
             <EditText
-                android:id="@+id/ed_btName"
+                android:id="@+id/ed_distRange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
-                android:hint="請輸入藍芽名稱"
-                android:inputType="textPersonName" />
+                android:hint="範圍為300 ~ 800"
+                android:inputType="number" />
         </LinearLayout>
 
 

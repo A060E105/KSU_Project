@@ -11,28 +11,31 @@
     <!-- TODO: Update blank fragment layout -->
 
     <Button
-        android:id="@+id/btn_left"
-        android:layout_width="247dp"
-        android:layout_height="230dp"
-        android:layout_weight="1"
-        android:background="@drawable/images"
-        android:text="123"
-        android:textColor="@color/colorAccent"
-        android:textSize="90dp"
-        tools:layout_editor_absoluteX="-23dp"
-        tools:layout_editor_absoluteY="222dp" />
-
-    <Button
         android:id="@+id/btn_right"
-        android:layout_width="247dp"
+        android:layout_width="225dp"
         android:layout_height="230dp"
+        android:layout_marginTop="140dp"
         android:layout_weight="1"
         android:background="@drawable/images"
         android:gravity="center"
         android:text="456"
         android:textColor="@color/colorAccent"
         android:textSize="90dp"
-        tools:layout_editor_absoluteX="184dp"
-        tools:layout_editor_absoluteY="222dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_left"
+        android:layout_width="225dp"
+        android:layout_height="230dp"
+        android:layout_marginTop="140dp"
+        android:layout_weight="1"
+        android:background="@drawable/images"
+        android:paddingLeft="0dp"
+        android:text="123"
+        android:textColor="@color/colorAccent"
+        android:textSize="90dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

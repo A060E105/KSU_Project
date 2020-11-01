@@ -56,7 +56,9 @@ public class MainActivity extends AppCompatActivity {
     private final static UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     public static boolean destroyFlag = true;
+    private int range = 0;
 
+    public static int Range = 0;
     private final static int REQUEST_ENABLE_BT = 1;
     public final static int MESSAGE_READ = 2;
     private final static int CONNECTING_STATUS = 3;
@@ -87,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
 
         mBTArrayAdapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1);
         initFragment();
+
+        range = loadDistRange();
 
         mHandler = new Handler(Looper.getMainLooper()) {
             @Override
@@ -123,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 String address = load();
                 Log.d(TAG, "onCreate: load address " + address);
-                if (address != null) {
+                if (!address.matches("")) {
                     connectBluetooth(address);
                 } else {
                     listPairedDevices();
@@ -424,8 +428,31 @@ public class MainActivity extends AppCompatActivity {
         // fragment_home
         Button btn_left = (Button)findViewById(R.id.btn_left);
         Button btn_right = (Button)findViewById(R.id.btn_right);
-        btn_left.setText(L_dist + "\nCM");
-        btn_right.setText(R_dist + "\nCM");
+        btn_left.setText(L_dist);
+        btn_right.setText(R_dist);
+        if (Range != 0) {
+            if (Integer.parseInt(L_dist) > Range) {
+                btn_left.setVisibility(View.VISIBLE);
+            } else {
+                btn_left.setVisibility(View.INVISIBLE);
+            }
+            if (Integer.parseInt(R_dist) > Range) {
+                btn_right.setVisibility(View.VISIBLE);
+            } else {
+                btn_right.setVisibility(View.INVISIBLE);
+            }
+        } else {
+            if (Integer.parseInt(L_dist) > range) {
+                btn_left.setVisibility(View.VISIBLE);
+            } else {
+                btn_left.setVisibility(View.INVISIBLE);
+            }
+            if (Integer.parseInt(R_dist) > range) {
+                btn_right.setVisibility(View.VISIBLE);
+            } else {
+                btn_right.setVisibility(View.INVISIBLE);
+            }
+        }
         // fragment_message left
         TextView tv_L_dist = (TextView)findViewById(R.id.tv_L_dist);
         TextView tv_L_strength = (TextView)findViewById(R.id.tv_L_strength);
@@ -461,6 +488,39 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public int loadDistRange() {
+        FileInputStream input = null;
+        BufferedReader reader = null;
+        StringBuilder distRange = new StringBuilder();
+
+        try {
+            input = openFileInput("distrange");
+            reader = new BufferedReader(new InputStreamReader(input));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                distRange.append(line);
+            }
+            Log.d(TAG, "load: load dist range");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (distRange.toString().matches("")) {
+            // default
+            return 300;
+        } else {
+            String str = distRange.toString();
+            return Integer.parseInt(str);
         }
     }
 
