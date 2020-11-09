@@ -56,9 +56,9 @@ public class MainActivity extends AppCompatActivity {
     private final static UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     public static boolean destroyFlag = true;
-    private int range = 0;
+    private int Range_old = 0;
 
-    public static int Range = 0;
+    public static int Range_new = 0;
     private final static int REQUEST_ENABLE_BT = 1;
     public final static int MESSAGE_READ = 2;
     private final static int CONNECTING_STATUS = 3;
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         mBTArrayAdapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1);
         initFragment();
 
-        range = loadDistRange();
+        Range_old = loadDistRange();
 
         mHandler = new Handler(Looper.getMainLooper()) {
             @Override
@@ -430,24 +430,28 @@ public class MainActivity extends AppCompatActivity {
         Button btn_right = (Button)findViewById(R.id.btn_right);
         btn_left.setText(L_dist);
         btn_right.setText(R_dist);
-        if (Range != 0) {
-            if (Integer.parseInt(L_dist) > Range) {
+        // 如果有更改靈敏度則使用新設定的靈敏度，否則使用上次設定的靈敏度
+        if (Range_new != 0) {
+            // 小於設定的範圍則顯示按鈕
+            if (Integer.parseInt(L_dist) < Range_new) {
+                // 顯示按鈕
                 btn_left.setVisibility(View.VISIBLE);
             } else {
+                // 隱藏按鈕
                 btn_left.setVisibility(View.INVISIBLE);
             }
-            if (Integer.parseInt(R_dist) > Range) {
+            if (Integer.parseInt(R_dist) < Range_new) {
                 btn_right.setVisibility(View.VISIBLE);
             } else {
                 btn_right.setVisibility(View.INVISIBLE);
             }
         } else {
-            if (Integer.parseInt(L_dist) > range) {
+            if (Integer.parseInt(L_dist) < Range_old) {
                 btn_left.setVisibility(View.VISIBLE);
             } else {
                 btn_left.setVisibility(View.INVISIBLE);
             }
-            if (Integer.parseInt(R_dist) > range) {
+            if (Integer.parseInt(R_dist) < Range_old) {
                 btn_right.setVisibility(View.VISIBLE);
             } else {
                 btn_right.setVisibility(View.INVISIBLE);

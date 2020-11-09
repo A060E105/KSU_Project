@@ -147,7 +147,7 @@ public class Fragment_setting extends Fragment {
                                             if (distRange <= 800 && distRange >= 300) {
                                                 // save dist rnage to file
                                                 saveDistRange(distRange);
-                                                MainActivity.Range = distRange;
+                                                MainActivity.Range_new = distRange;
 //                                                Toast.makeText(getContext(), "將於下次啟動時生效", LENGTH_LONG).show();
                                             } else {
                                                 Toast.makeText(getContext(), "range is 300 to 800", LENGTH_SHORT).show();
