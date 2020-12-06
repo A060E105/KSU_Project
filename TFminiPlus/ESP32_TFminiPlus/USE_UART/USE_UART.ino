@@ -9,6 +9,7 @@
 #include "esp_system.h"
 
 #define HEADER 0x59
+#define BUZZER 5
 
 StaticJsonDocument<200> jsondata;
 
@@ -115,6 +116,19 @@ void sendJSON(TFdata *pL_TFdata, TFdata *pR_TFdata)
     serializeJson(jsondata, Serial);    // send json data to Serial
 }
 
+void setBuzzer(int status)
+{
+    switch(status) {
+        case 0:
+            digitalWrite(BUZZER, LOW);
+            break;
+        case 1:
+            digitalWrite(BUZZER, HIGH);
+            break;
+        default:
+        ;;
+    }
+}
 
 
 void setup(void)
@@ -124,6 +138,9 @@ void setup(void)
     BT.begin("TFminiPlus");                         // set Bluetooth name
     L_TFmini.begin(115200, SERIAL_8N1, 4, 2);       // baud rate, parity, RX|TX ; Left TFmini Plus sensor.
     R_TFmini.begin(115200, SERIAL_8N1, 16, 17);     // right TFmini plus sensor.
+
+    // buzzer initialization
+    pinMode(BUZZER, OUTPUT);
 
     // watchdog setting
     timer = timerBegin(0, 80, true);                    // timer 0, div 80
@@ -138,8 +155,24 @@ void setup(void)
 void loop(void)
 {
     timerWrite(timer, 0);                   // reset timer (feed watchdog)
-    ReadTFmini(&R_TFmini, &R_TFdata);       // Read Right TFmini plus data
-    ReadTFmini(&L_TFmini, &L_TFdata);       // Read Left TFmini plus data
-    sendJSON(&L_TFdata, &R_TFdata);         // data to json and send
+    if (Serial.available()) {
+        unsigned int cmd;
+        cmd = Serial.read();
+        Serial.println(cmd);
+        if (cmd == 49) {
+            ReadTFmini(&R_TFmini, &R_TFdata);       // Read Right TFmini plus data
+            ReadTFmini(&L_TFmini, &L_TFdata);       // Read Left TFmini plus data
+            sendJSON(&L_TFdata, &R_TFdata);         // data to json and send
+        } else if (cmd == 50) {
+            setBuzzer(1);
+        } else if (cmd == 51) {
+            setBuzzer(0);
+        }
+    }
+    // ReadTFmini(&R_TFmini, &R_TFdata);       // Read Right TFmini plus data
+    // ReadTFmini(&L_TFmini, &L_TFdata);       // Read Left TFmini plus data
+    // sendJSON(&L_TFdata, &R_TFdata);         // data to json and send
+    CleanFlush(&R_TFmini);
+    CleanFlush(&L_TFmini);
     delay(10);
 }
