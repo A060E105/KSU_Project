@@ -49,6 +49,9 @@ public class ConnectedThread extends Thread {
 
         while (true) {
             try {
+                // write command to ESP32
+                write(MainActivity.ESP32_command);
+                SystemClock.sleep(100);
                 numBytes = mmInStream.read(mmBuffer);
                 SystemClock.sleep(100);
                 Message readMsg = mHandler.obtainMessage(MainActivity.MESSAGE_READ, numBytes, -1, mmBuffer);

@@ -58,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
     public static boolean destroyFlag = true;
     private int Range_old = 0;
 
+    // Bluetooth write to ESP32 command, status has 0 or 1
+    // 0 is get TFminiPlus data
+    // 1 is get TFminiPlus data and open buzzer
+    public static String ESP32_command = "0";
+
     public static int Range_new = 0;
     private final static int REQUEST_ENABLE_BT = 1;
     public final static int MESSAGE_READ = 2;
@@ -436,25 +441,47 @@ public class MainActivity extends AppCompatActivity {
             if (Integer.parseInt(L_dist) < Range_new) {
                 // 顯示按鈕
                 btn_left.setVisibility(View.VISIBLE);
+                // set ESP32 command with 1
+                ESP32_command = "1";
             } else {
                 // 隱藏按鈕
                 btn_left.setVisibility(View.INVISIBLE);
+                // set ESP32 command with 0
+                ESP32_command = "0";
             }
             if (Integer.parseInt(R_dist) < Range_new) {
+                // 顯示按鈕
                 btn_right.setVisibility(View.VISIBLE);
+                // set ESP32 command with 1
+                ESP32_command = "1";
             } else {
+                // 隱藏按鈕
                 btn_right.setVisibility(View.INVISIBLE);
+                // set ESP32 command with 0
+                ESP32_command = "0";
             }
         } else {
             if (Integer.parseInt(L_dist) < Range_old) {
+                // 顯示按鈕
                 btn_left.setVisibility(View.VISIBLE);
+                // set ESP32 command with 1
+                ESP32_command = "1";
             } else {
+                // 隱藏按鈕
                 btn_left.setVisibility(View.INVISIBLE);
+                // set ESP32 command with 0
+                ESP32_command = "0";
             }
             if (Integer.parseInt(R_dist) < Range_old) {
+                // 顯示按鈕
                 btn_right.setVisibility(View.VISIBLE);
+                // set ESP32 command with 1
+                ESP32_command = "1";
             } else {
+                // 隱藏按鈕
                 btn_right.setVisibility(View.INVISIBLE);
+                // set ESP32 command with 0
+                ESP32_command = "0";
             }
         }
         // fragment_message left
