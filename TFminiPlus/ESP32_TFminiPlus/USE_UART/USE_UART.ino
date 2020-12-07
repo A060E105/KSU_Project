@@ -116,13 +116,15 @@ void sendJSON(TFdata *pL_TFdata, TFdata *pR_TFdata)
     serializeJson(jsondata, Serial);    // send json data to Serial
 }
 
-void setBuzzer(int status)
+void setBuzzer(bool status)
 {
     switch(status) {
-        case 0:
+        case true:
+            // Buzzer is low enable
             digitalWrite(BUZZER, LOW);
             break;
-        case 1:
+        case false:
+            // disable Buzzer 
             digitalWrite(BUZZER, HIGH);
             break;
         default:
@@ -141,6 +143,7 @@ void setup(void)
 
     // buzzer initialization
     pinMode(BUZZER, OUTPUT);
+    digitalWrite(BUZZER, HIGH);     // Buzzer is low enable
 
     // watchdog setting
     timer = timerBegin(0, 80, true);                    // timer 0, div 80
@@ -155,24 +158,31 @@ void setup(void)
 void loop(void)
 {
     timerWrite(timer, 0);                   // reset timer (feed watchdog)
-    if (Serial.available()) {
-        unsigned int cmd;
-        cmd = Serial.read();
+
+    // read bluetooth command
+    if (BT.available()) {
+        char cmd;
+        cmd = BT.read();
         Serial.println(cmd);
-        if (cmd == 49) {
-            ReadTFmini(&R_TFmini, &R_TFdata);       // Read Right TFmini plus data
-            ReadTFmini(&L_TFmini, &L_TFdata);       // Read Left TFmini plus data
-            sendJSON(&L_TFdata, &R_TFdata);         // data to json and send
-        } else if (cmd == 50) {
-            setBuzzer(1);
-        } else if (cmd == 51) {
-            setBuzzer(0);
+        switch(cmd) {
+            case '0':
+                ReadTFmini(&R_TFmini, &R_TFdata);       // Read Right TFmini plus data
+                ReadTFmini(&L_TFmini, &L_TFdata);       // Read Left TFmini plus data
+                sendJSON(&L_TFdata, &R_TFdata);         // data to json and send
+                setBuzzer(false);                       // close buzzer
+                break;
+            case '1':
+                ReadTFmini(&R_TFmini, &R_TFdata);       // Read Right TFmini plus data
+                ReadTFmini(&L_TFmini, &L_TFdata);       // Read Left TFmini plus data
+                sendJSON(&L_TFdata, &R_TFdata);         // data to json and send
+                setBuzzer(true);                        // open buzzer
+                break;
+            default:
+                ;;
         }
     }
-    // ReadTFmini(&R_TFmini, &R_TFdata);       // Read Right TFmini plus data
-    // ReadTFmini(&L_TFmini, &L_TFdata);       // Read Left TFmini plus data
-    // sendJSON(&L_TFdata, &R_TFdata);         // data to json and send
-    CleanFlush(&R_TFmini);
+
+    CleanFlush(&R_TFmini);          // clear serial buffer
     CleanFlush(&L_TFmini);
     delay(10);
 }
